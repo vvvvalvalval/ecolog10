@@ -1,0 +1,285 @@
+:author: Valentin Waeselynck
+:email: valentin.waeselynck@polytechnique.edu
+:man-linkstyle: blue R <>
+:mansource: Asciidoctor
+:manversion: 1.0
+:manmanual: Asciidoctor
+:icons: font
+:stem:
+= To reduce GHG emissions, count them in centibels =
+
+[quote,'David Mackay', 'https://www.withouthotair.com/[*Sustainable Energy, without the hot air*]']
+____
+We need a plan that adds up!
+____
+
+
+[WARNING]
+====
+This website is still a work in progress. In particular, the following enhancements are planned:
+
+1. Visualizations
+1. Tutorial for computing _percentage <--> scale factor <--> centibels_ conversions.
+1. Interactive widget for the above.
+1. New section about caveats, limitations and workarounds
+1. New case study: car efficiency
+1. New case study: Kaya equation
+1. Alternate article for a scientific audience
+1. French translation
+
+====
+
+
+== Introduction ==
+
+*The problem:* the environmental transition requires us to make plans with numbers - numbers such as 'GHG emissions must be reduced by 5% every year' or 'the emissions from sea shipping should be halved by 2050'.
+
+Currently, we're not very good as dealing with such numbers. This guide aims to provide everyone with intellectual tools that make this quantitative planning more straightforward in many situations, while requiring no more than elementary-school math.
+
+The main notion we introduce is the *centibel*. The _centibel_ is a unit of measure for how much some quantity gets scaled or downscaled. It turns out that if we frame our objectives and opportunities in terms of centibels (as opposed to percentages or physical units), many GHG reductions problems become easy to work out and visualize.
+
+The following table gives you a conversion between centibels and more familiar representations:
+
+[cols=3*, options="header"]
+|===
+|Percentage
+|Scale factor
+|Centibels
+
+
+|*+900%*
+|*×10*
+|*+100.00 cB*
+
+|+400%
+|×5
+|+69.90 cB
+
+|+300%
+|×4
+|+60.21 cB
+
+|+200%
+|×3
+|+47.71 cB
+
+|*+100%*
+|*×2*
+|*+30.10 cB*
+
+|*+50%*
+|*×1.50*
+|*+17.61 cB*
+
+|+33%
+|×1.33
+|+12.39 cB
+
+|+25%
+|×1.25
+|+9.69 cB
+
+|+20%
+|×1.20
+|+7.92 cB
+
+|+15%
+|×1.15
+|+6.07 cB
+
+|+10%
+|×1.10
+|+4.14 cB
+
+|+5%
+|×1.05
+|+2.12 cB
+
+|+4%
+|×1.04
+|+1.70 cB
+
+|+3%
+|×1.03
+|+1.28 cB
+
+|+2%
+|×1.02
+|+0.86 cB
+
+|*+1%*
+|*×1.01*
+|*+0.43 cB*
+
+|*+0%*
+|*×1*
+|*+0.00 cB*
+
+|*-1%*
+|*×0.99*
+|*-0.44 cB*
+
+|-2%
+|×0.98
+|-0.88 cB
+
+|-3%
+|×0.97
+|-1.32 cB
+
+|-4%
+|×0.96
+|-1.77 cB
+
+|-5%
+|×0.95
+|-2.23 cB
+
+|-10%
+|×0.90
+|-4.58 cB
+
+|-15%
+|×0.85
+|-7.06 cB
+
+|-20%
+|×0.80
+|-9.69 cB
+
+|-25%
+|×0.75
+|-12.49 cB
+
+|-30%
+|×0.70
+|-15.49 cB
+
+|-40%
+|×0.60
+|-22.18 cB
+
+|*-50%*
+|*× asciimath:[1/2]*
+|*-30.10 cB*
+
+|-60%
+|×0.40
+|-39.79 cB
+
+|-65%
+|×0.35
+|-45.59 cB
+
+|-70%
+|×0.30
+|-52.29 cB
+
+|*-75%*
+|*×0.25*
+|*-60.21 cB*
+
+|-80%
+|×0.20
+|-69.90 cB
+
+|-85%
+|×0.15
+|-82.39 cB
+
+|*-90%*
+|*×0.10*
+|*-100.00 cB*
+
+|*-95%*
+|*×0.05*
+|*-130.10 cB*
+
+|-97%
+|×0.03
+|-152.29 cB
+
+|-98%
+|×0.02
+|-169.90 cB
+
+|*-99%*
+|*×0.01*
+|*-200.00 cB*
+|===
+
+
+
+
+== Example: emissions reduction pathway ==
+
+[]
+====
+
+*Case study:* To have a good chance of limiting global warming to less than +2°C, we decide starting from now to *reduce GHG emissions at a rate of -5.7% every year.*
+
+_By how much will we have reduced GHG emissions in 10 years?_
+
+====
+
+Most people will either tell you that they don't know, or give the instinctive but incorrect answer of -57%. Those few who can find the correct formula of latexmath:[100 \times \left(1 - \left(1 - \frac{5.7}{100}\right)^{10}\right)] probably cannot compute it off the top of their heads. The fundamental issue here is that repeated applications of percentages is tricky.
+
+On the other hand, if we frame our objective as
+
+[]
+====
+_We will reduce our GHG emissions by -2.55 cB/year_
+====
+
+anyone can tell that in 10 years, we will have reduced them by -25.5cB, from which you can quickly translate it to a -45% reduction. *In centibels, the correct calculation is the intuitive one.*
+
+
+The advantage of centibels is even more evident when we reverse the problem:
+
+[]
+====
+_If we aim for -48% GHG emissions in 10 years, by what fraction must we reduce them each year?_
+====
+
+At this point, only the scientifically trained have a chance of finding the correct formula of latexmath:[100 \times \left(1 - \left(1 - \frac{48}{100}\right)^{\frac{1}{10}}\right)]. On the other hand, if I tell you that we aim for -28.4 cB in 10 years, you can easily tell that this translates to a reduction of -2.84 cB/year.
+
+
+
+== Example: saving fuel on cargo ships ==
+
+[]
+====
+You might have heard that a cargo ship consumes *less fuel when it goes more slowly*, which reduces GHG emissions.
+
+However, reducing the speed of a cargo ship also reduces the _throughput_ at which it delivers goods, and so reducing speed will *increase the number of cargo ships at sea,* which increases GHG emissions.
+
+_Can we tell which effect will win out? **Can we reduce GHG emissions by changing the speed of cargo ships?**_
+====
+
+We have the following *formulas for transportation throughput and GHG emissions:*
+
+[latexmath]
+++++
+\text{transportation throughput} = A \times \text{fleet size} \times \text{ship speed}
+++++
+
+
+[latexmath]
+++++
+\text{GHG emissions} = B \times \text{fleet size} \times (\text{ship speed})^3
+++++
+
+in which latexmath:[A] and latexmath:[B] are constants which won't matter to us here.
+
+From these formulas, any engineer can give you the following elements:
+
+1. Increasing fleet size by +1 cB will *increase both throughput and GHG emissions by +1 cB*
+2. Decreasing ship speed by -1 cB will *decrease throughput by -1 cB and GHG emissions by -3 cB*
+
+From here, you can deduce that _**by trading -1 cB in ship speed for +1 cB in fleet size, you keep the same transportation throughput, while reducing GHG emissions by +1 -3 = -2 cB.**_
+
+So the answer is: _yes_, reducing ship speed does reduce GHG emissions in spite of the increase in fleet size (hurray!). Notice that by framing the situation in terms of centibels, we made this opportunity easy to spot and work out.
+
+For example, you can verify that a -10cB reduction in speed compensated by a +10cB increase in fleet size would translate to -20.6% in ship speed, +25.9% in fleet size, and -36.9% in GHG emissions from fuel consumption. In addition, compounding this approach with a _sobriety_ policy, we might not compensate all the way to +10cB in fleet size, in which case the GHG emissions would be even more reduced.
+
+Of course, such a change would have drawbacks: for example personel costs would increase and sea voyages would last longer. But this is typically the sort of tradeoffs to be considered for the environmental transition.
