@@ -5,6 +5,7 @@
 :manversion: 1.0
 :manmanual: Asciidoctor
 :icons: font
+:imagesdir: ./img
 :stem:
 = To reduce GHG emissions, count them in centibels =
 
@@ -207,6 +208,38 @@ The following table gives you a conversion between centibels and more familiar r
 |*×0.01*
 |*-200.00 cB*
 |===
+
+
+== Problem: compounded reductions are misrepresented ==
+
+
+
+
+== Example: reducing emissions from driving cars ==
+
+*Case study:* suppose we want to reduce the GHG emissions from driving individual cars.
+
+On the long term, we want to divide said emissions by 10 (-90%), which corresponds exactly to a -100cB variation.
+
+Following https://www.withouthotair.com/cA/page_254.shtml[MacKay], we model the problem by decomposing the car-driving emissions into the following **factors:**
+
+1. **Engine carbon intensity:** how much CO2 the engine emits per energy delivered. (in teqCO2/kWh)
+  - _**Influenced by:** engine technology, fuel production._
+1. **Distance-wise displaced mass:** how much matter is set into motion per mile traveled (in ton/mile), through car acceleration or air resistance.
+  - _**Influenced by:** vehicle weight, aerodynamic profile, distance between stops._
+1. **Energy per displaced mass:** how much kinetic energy is spent per ton of displaced mass (in kWh/ton).
+  - _**Influenced by:** driving speed._
+1. **Usage:** how much we drive (in miles).
+  - _**Influenced by:** lifestyle._
+
+Importantly, as we make enhancements to reduce each factor, _**the effects multiply.**_ This might sound like good news, but it usually works to our disappointment: for example, if we reduced by 20% each of the 4 above-mentioned factors, the result would no be a -80% reduction of CO2 emissions, but a more modest -59%, which would leave twice as much residual emissions.
+
+When we frame the situation _**in centibels, these multiplications become additions,**_ which are easier to reason about and visualize. As an example, the following chart uses this fact to show how various reduction actions might contribute to lowering car-driving emissions:
+
+[#cars-economy-centibels]
+.How various reduction actions might be combined to lowering car-driving emissions (numbers chosen arbitrarily).
+image::cars-economy-centibels.svg[]
+
 
 
 
