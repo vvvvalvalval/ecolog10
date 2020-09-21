@@ -8,5 +8,5 @@ An accessible introduction to using logarithmic representations for planning the
 To watch and compile Asciidoctor files:
 
 ```
-lein auto asciidoctor
+mkdir -p generated/img && cp -f img/* generated/img/ && lein auto asciidoctor
 ```

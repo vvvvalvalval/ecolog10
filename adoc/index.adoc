@@ -7,7 +7,7 @@
 :icons: font
 :imagesdir: ./img
 :stem:
-= To reduce GHG emissions, count them in centibels =
+= In centibels: another perspective on reducing GHG emissions =
 
 [quote,'David Mackay', 'https://www.withouthotair.com/[*Sustainable Energy, without the hot air*]']
 ____
@@ -215,6 +215,34 @@ The following table gives you a conversion between centibels and more familiar r
 
 
 
+== Example: reducing emissions from cement ==
+
+Assume that we want to reduce the CO₂ emissions from producing cement for construction : for example, we might aim to divide these emissions by 10 (-90%) on the long term, which corresponds exactly to a -100 cB target.
+
+To model cement-production GHG emissions, we decompose them into the following factors:
+
+1. **CO₂ intensity:** how much CO₂ is emitted from producing a ton of cement. (in tCO₂eq/t)
+  - _**Influenced by:** production technology._
+1. **Construction density:** how much cement we use per building area (in t/m²).
+  - _**Influenced by:** architectural design._
+1. **Usage:** how much we build (in m²).
+  - _**Influenced by:** housing policies, lifestyle choices._
+
+To be more explicit: in this model, CO₂ emissions are given by the following formula:
+
+[latexmath]
+++++
+\text{CO₂ emissions} = \text{CO₂ intensity} \times \text{construction density} \times \text{usage}
+++++
+
+When using centibels, the above equation turns in to the 'budget problem' of splitting the -100cB reduction across our 3 factors. The following chart provides an example:
+
+[#cement-economy-centibels]
+.How various reduction actions might be combined to lowering emissions from cement (numbers chosen arbitrarily).
+image::cement-economy-centibels.svg[width=100%]
+
+
+
 == Example: reducing emissions from driving cars ==
 
 *Case study:* suppose we want to reduce the GHG emissions from driving individual cars.
@@ -223,7 +251,7 @@ On the long term, we want to divide said emissions by 10 (-90%), which correspon
 
 Following https://www.withouthotair.com/cA/page_254.shtml[MacKay], we model the problem by decomposing the car-driving emissions into the following **factors:**
 
-1. **Engine carbon intensity:** how much CO2 the engine emits per energy delivered. (in teqCO2/kWh)
+1. **Engine carbon intensity:** how much CO₂ the engine emits per energy delivered. (in teqCO₂/kWh)
   - _**Influenced by:** engine technology, fuel production._
 1. **Distance-wise displaced mass:** how much matter is set into motion per mile traveled (in ton/mile), through car acceleration or air resistance.
   - _**Influenced by:** vehicle weight, aerodynamic profile, distance between stops._
@@ -232,7 +260,7 @@ Following https://www.withouthotair.com/cA/page_254.shtml[MacKay], we model the 
 1. **Usage:** how much we drive (in miles).
   - _**Influenced by:** lifestyle._
 
-Importantly, as we make enhancements to reduce each factor, _**the effects multiply.**_ This might sound like good news, but it usually works to our disappointment: for example, if we reduced by 20% each of the 4 above-mentioned factors, the result would no be a -80% reduction of CO2 emissions, but a more modest -59%, which would leave twice as much residual emissions.
+Importantly, as we make enhancements to reduce each factor, _**the effects multiply.**_ This might sound like good news, but it usually works to our disappointment: for example, if we reduced by 20% each of the 4 above-mentioned factors, the result would no be a -80% reduction of CO₂ emissions, but a more modest -59%, which would leave twice as much residual emissions.
 
 When we frame the situation _**in centibels, these multiplications become additions,**_ which are easier to reason about and visualize. As an example, the following chart uses this fact to show how various reduction actions might contribute to lowering car-driving emissions:
 
@@ -275,6 +303,49 @@ _If we aim for -48% GHG emissions in 10 years, by what fraction must we reduce t
 ====
 
 At this point, only the scientifically trained have a chance of finding the correct formula of latexmath:[100 \times \left(1 - \left(1 - \frac{48}{100}\right)^{\frac{1}{10}}\right)]. On the other hand, if I tell you that we aim for -28.4 cB in 10 years, you can easily tell that this translates to a reduction of -2.84 cB/year.
+
+
+=== How many centibels per year? ===
+
+We mentioned a 'speed of decline' of GHG emissions of -2.55 cB/year. This section explains how to compute such a number.
+
+At the time of writing, it is estimated that the world has a remaining https://www.theguardian.com/environment/datablog/2017/jan/19/carbon-countdown-clock-how-much-of-the-worlds-carbon-budget-have-we-spent['emissions budget'] of 646 GtCO2e to stay below +2°C of global warming.
+
+Emissions reduction pathways are designed so as to not emit more than this 646 GtCO2e threshold in the future: the 'speed of decline' is computed accordingly, depending on when we start reducing emissions (the more we delay, the faster we will have to reduce emissions). The mathematics of the problem are too involved to derive here, but they yield the following rule:
+
+[]
+====
+**Working out the required 'speed of decline' of GHG emissions, in cB/year**:
+
+1. If we kept our current yearly emissions of https://www.globalcarbonproject.org/carbonbudget/19/presentation.htm[42.1 GtCO2e/year], we would have exhausted our 646 GtCO2e carbon budget in 2036. **Let's call 2036 the _Pivot Year_** for global emissions.
+2. **Constraint:** we must have reduced emissions by **-43.4 cB at the Pivot Year.** (-63.2%)footnote:[Note to scientists: -43.3 cB corresponds to a division by the mathematical constant e = 2.71828...]
+====
+
+So if we started reducing in 2021, this would mean a reduction of -43.4 cB in 15 years, i.e -2.89 cB/year (-6.45% every year).
+
+If we delayed by 5 years and started reducing in 2026, this would be a much more challenging -4.34 cB/year (-9.52% every year).
+
+image::exp-decay-global-pathways.svg[width=100%]
+
+[WARNING]
+.The specific shape of the pathway is critical
+====
+The above 'target' of -43.4 cB only applies to 'constant centibels speed' reduction pathways (which consist of reducing emissions by the same numbers of centibels every year - known in the scientific community as _exponential decay pathways_). If the curve of our emissions doesn't follow rigourously this specific shape, especially in early years, this rule no longer works.
+
+For example, in order to account for 'inertia' in yearly emissions, another approach is to plan reductions not at 'constant centibels speed', but at 'constant centibels _acceleration_': emissions then follow a 'half-bell curve' with a slower decline in early years and a more brutal 'landing' in late years. In this case, the Pivot Year target is -34.1 cBfootnote:[Note to scientists: -34.1 cB corresponds to a division by the mathematical constant latexmath:[e^{\frac{\pi}{4}}]]; starting the reductions in 2021 would then require an 'acceleration' of -0.303 cB/year².
+====
+
+[WARNING]
+.Emissions budgets may vary by country or sector
+====
+FIXME
+====
+
+[WARNING]
+.Negative emissions
+====
+FIXME
+====
 
 
 
