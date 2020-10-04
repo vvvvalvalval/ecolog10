@@ -212,6 +212,27 @@ The following table gives you a conversion between centibels and more familiar r
 
 == Problem: compounded reductions are misrepresented ==
 
+FIXME
+
+
+image::pct-vs-centibels-reductions.svg[width=100%]
+
+[TIP]
+====
+**KEY TAKEWAY**
+
+When emissions are decomposed into several factors, centibels measure emission reductions evenly across all factors.
+====
+
+[TIP]
+====
+**KEY TAKEWAY**
+
+Centibels make it easier to plan emissions reductions as a measured combination of efficiency gains and sobriety, rather than an unrealistic binary choice between efficiency and sobriety.
+
+In particular, using centibels tends to reveal the following challenge: _even highly-impressive enhancements in efficiency can leave significant work to sobriety._
+
+====
 
 
 
@@ -241,34 +262,14 @@ When using centibels, the above equation turns in to the 'budget problem' of spl
 .How various reduction actions might be combined to lowering emissions from cement (numbers chosen arbitrarily).
 image::cement-economy-centibels.svg[width=100%]
 
+[TIP]
+====
+**KEY TAKEWAY**
 
+When expressed in centibels, emissions reduction objectives become a 'budget' problem: how many centibels are contributed by each factor.
 
-== Example: reducing emissions from driving cars ==
-
-*Case study:* suppose we want to reduce the GHG emissions from driving individual cars.
-
-On the long term, we want to divide said emissions by 10 (-90%), which corresponds exactly to a -100cB variation.
-
-Following https://www.withouthotair.com/cA/page_254.shtml[MacKay], we model the problem by decomposing the car-driving emissions into the following **factors:**
-
-1. **Engine carbon intensity:** how much CO₂ the engine emits per energy delivered. (in teqCO₂/kWh)
-  - _**Influenced by:** engine technology, fuel production._
-1. **Distance-wise displaced mass:** how much matter is set into motion per mile traveled (in ton/mile), through car acceleration or air resistance.
-  - _**Influenced by:** vehicle weight, aerodynamic profile, distance between stops._
-1. **Energy per displaced mass:** how much kinetic energy is spent per ton of displaced mass (in kWh/ton).
-  - _**Influenced by:** driving speed._
-1. **Usage:** how much we drive (in miles).
-  - _**Influenced by:** lifestyle._
-
-Importantly, as we make enhancements to reduce each factor, _**the effects multiply.**_ This might sound like good news, but it usually works to our disappointment: for example, if we reduced by 20% each of the 4 above-mentioned factors, the result would no be a -80% reduction of CO₂ emissions, but a more modest -59%, which would leave twice as much residual emissions.
-
-When we frame the situation _**in centibels, these multiplications become additions,**_ which are easier to reason about and visualize. As an example, the following chart uses this fact to show how various reduction actions might contribute to lowering car-driving emissions:
-
-[#cars-economy-centibels]
-.How various reduction actions might be combined to lowering car-driving emissions (numbers chosen arbitrarily).
-image::cars-economy-centibels.svg[]
-
-
+This is not possible with percentages or tCO₂eq, because the reductions on individual factors are compounded.
+====
 
 
 
@@ -277,22 +278,23 @@ image::cars-economy-centibels.svg[]
 []
 ====
 
-*Case study:* To have a good chance of limiting global warming to less than +2°C, we decide starting from now to *reduce GHG emissions at a rate of -5.7% every year.*
+*Case study:* To have a good chance of limiting global warming to less than +2°C, we decide starting from now to *reduce GHG emissions at a rate of -6.4% every year.*
 
 _By how much will we have reduced GHG emissions in 10 years?_
 
 ====
 
-Most people will either tell you that they don't know, or give the instinctive but incorrect answer of -57%. Those few who can find the correct formula of latexmath:[100 \times \left(1 - \left(1 - \frac{5.7}{100}\right)^{10}\right)] probably cannot compute it off the top of their heads. The fundamental issue here is that repeated applications of percentages is tricky.
+Most people will either tell you that they don't know, or give the instinctive but incorrect answer of -64%. Those few who can find the correct formula of latexmath:[100 \times \left(1 - \left(1 - \frac{5.7}{100}\right)^{10}\right)] probably cannot compute it off the top of their heads. The fundamental issue here is that repeated applications of percentages is tricky.
 
 On the other hand, if we frame our objective as
 
 []
 ====
-_We will reduce our GHG emissions by -2.55 cB/year_
+_We will reduce our GHG emissions by -2.89 cB/year_
 ====
 
-anyone can tell that in 10 years, we will have reduced them by -25.5cB, from which you can quickly translate it to a -45% reduction. *In centibels, the correct calculation is the intuitive one.*
+anyone can tell that in 10 years, we will have reduced them by -28.9cB, from which you can quickly translate it to a -49% reduction. *In centibels, the correct calculation is the intuitive one.*
+
 
 
 The advantage of centibels is even more evident when we reverse the problem:
@@ -305,9 +307,21 @@ _If we aim for -48% GHG emissions in 10 years, by what fraction must we reduce t
 At this point, only the scientifically trained have a chance of finding the correct formula of latexmath:[100 \times \left(1 - \left(1 - \frac{48}{100}\right)^{\frac{1}{10}}\right)]. On the other hand, if I tell you that we aim for -28.4 cB in 10 years, you can easily tell that this translates to a reduction of -2.84 cB/year.
 
 
+[TIP]
+====
+**KEY TAKEWAY**
+
+Successive applications of percentages are arithmetically hard. Most people get them wrong.
+
+In contrast, for same purpose, centibels require only basic additions and subtractions, the kind of which we use for everyday accounting.
+====
+
+
+
+
 === How many centibels per year? ===
 
-We mentioned a 'speed of decline' of GHG emissions of -2.55 cB/year. This section explains how to compute such a number.
+We mentioned a 'speed of decline' of GHG emissions of -2.89 cB/year. This section explains how to compute such a number.
 
 At the time of writing, it is estimated that the world has a remaining https://www.theguardian.com/environment/datablog/2017/jan/19/carbon-countdown-clock-how-much-of-the-worlds-carbon-budget-have-we-spent['emissions budget'] of 646 GtCO2e to stay below +2°C of global warming.
 
@@ -326,6 +340,16 @@ So if we started reducing in 2021, this would mean a reduction of -43.4 cB in 15
 If we delayed by 5 years and started reducing in 2026, this would be a much more challenging -4.34 cB/year (-9.52% every year).
 
 image::exp-decay-global-pathways.svg[width=100%]
+
+[TIP]
+====
+**KEY TAKEWAY**
+
+Exponential-decay pathways, one of the most commonly used type of trajectories for communicating about emissions reduction, are easy to reason about in centibels: we remove the same number of centibels every year.
+
+Thanks to the _"-43.3 cB at Pivot Year" rule,_ it's easy to keep track of the rate at which to reduce emissions (and how it grows as we delay).
+
+====
 
 [WARNING]
 .The specific shape of the pathway is critical
@@ -347,6 +371,10 @@ FIXME
 FIXME
 ====
 
+
+== Example: the Kaya equation ==
+
+FIXME
 
 
 == Example: saving fuel on cargo ships ==
@@ -387,3 +415,38 @@ So the answer is: _yes_, reducing ship speed does reduce GHG emissions in spite 
 For example, you can verify that a -10cB reduction in speed compensated by a +10cB increase in fleet size would translate to -20.6% in ship speed, +25.9% in fleet size, and -36.9% in GHG emissions from fuel consumption. In addition, compounding this approach with a _sobriety_ policy, we might not compensate all the way to +10cB in fleet size, in which case the GHG emissions would be even more reduced.
 
 Of course, such a change would have drawbacks: for example personel costs would increase and sea voyages would last longer. But this is typically the sort of tradeoffs to be considered for the environmental transition.
+
+
+[TIP]
+====
+**KEY TAKEWAY**
+
+In some situations, describing the effects of various actions in centibels can help us discover and quantify emissions reduction opportunities, especially when they affect different factors in opposite ways.
+====
+
+
+
+== Example: reducing emissions from driving cars ==
+
+*Case study:* suppose we want to reduce the GHG emissions from driving individual cars.
+
+On the long term, we want to divide said emissions by 10 (-90%), which corresponds exactly to a -100cB variation.
+
+Following https://www.withouthotair.com/cA/page_254.shtml[MacKay], we model the problem by decomposing the car-driving emissions into the following **factors:**
+
+1. **Engine carbon intensity:** how much CO₂ the engine emits per energy delivered. (in teqCO₂/kWh)
+  - _**Influenced by:** engine technology, fuel production._
+1. **Distance-wise displaced mass:** how much matter is set into motion per mile traveled (in ton/mile), through car acceleration or air resistance.
+  - _**Influenced by:** vehicle weight, aerodynamic profile, distance between stops._
+1. **Energy per displaced mass:** how much kinetic energy is spent per ton of displaced mass (in kWh/ton).
+  - _**Influenced by:** driving speed._
+1. **Usage:** how much we drive (in miles).
+  - _**Influenced by:** lifestyle._
+
+Importantly, as we make enhancements to reduce each factor, _**the effects multiply.**_ This might sound like good news, but it usually works to our disappointment: for example, if we reduced by 20% each of the 4 above-mentioned factors, the result would no be a -80% reduction of CO₂ emissions, but a more modest -59%, which would leave twice as much residual emissions.
+
+When we frame the situation _**in centibels, these multiplications become additions,**_ which are easier to reason about and visualize. As an example, the following chart uses this fact to show how various reduction actions might contribute to lowering car-driving emissions:
+
+[#cars-economy-centibels]
+.How various reduction actions might be combined to lowering car-driving emissions (numbers chosen arbitrarily).
+image::cars-economy-centibels.svg[]
