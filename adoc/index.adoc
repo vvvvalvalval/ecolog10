@@ -39,6 +39,8 @@ Currently, we're not very good as dealing with such numbers. This guide aims to 
 
 The main notion we introduce is the *centibel*. The _centibel_ is a unit of measure for how much some quantity gets scaled or downscaled. It turns out that if we frame our objectives and opportunities in terms of centibels (as opposed to percentages or physical units), many GHG reductions problems become easy to work out and visualize.
 
+image::rpct-centibels-conversion-ruler.svg[width=100%]
+
 The following table gives you a conversion between centibels and more familiar representations:
 
 [cols=3*, options="header"]
@@ -56,14 +58,6 @@ The following table gives you a conversion between centibels and more familiar r
 |×5
 |+69.90 cB
 
-|+300%
-|×4
-|+60.21 cB
-
-|+200%
-|×3
-|+47.71 cB
-
 |*+100%*
 |*×2*
 |*+30.10 cB*
@@ -76,17 +70,9 @@ The following table gives you a conversion between centibels and more familiar r
 |×1.33
 |+12.39 cB
 
-|+25%
-|×1.25
-|+9.69 cB
-
 |+20%
 |×1.20
 |+7.92 cB
-
-|+15%
-|×1.15
-|+6.07 cB
 
 |+10%
 |×1.10
@@ -95,18 +81,6 @@ The following table gives you a conversion between centibels and more familiar r
 |+5%
 |×1.05
 |+2.12 cB
-
-|+4%
-|×1.04
-|+1.70 cB
-
-|+3%
-|×1.03
-|+1.28 cB
-
-|+2%
-|×1.02
-|+0.86 cB
 
 |*+1%*
 |*×1.01*
@@ -120,18 +94,6 @@ The following table gives you a conversion between centibels and more familiar r
 |*×0.99*
 |*-0.44 cB*
 
-|-2%
-|×0.98
-|-0.88 cB
-
-|-3%
-|×0.97
-|-1.32 cB
-
-|-4%
-|×0.96
-|-1.77 cB
-
 |-5%
 |×0.95
 |-2.23 cB
@@ -140,41 +102,13 @@ The following table gives you a conversion between centibels and more familiar r
 |×0.90
 |-4.58 cB
 
-|-15%
-|×0.85
-|-7.06 cB
-
 |-20%
 |×0.80
 |-9.69 cB
 
-|-25%
-|×0.75
-|-12.49 cB
-
-|-30%
-|×0.70
-|-15.49 cB
-
-|-40%
-|×0.60
-|-22.18 cB
-
 |*-50%*
 |*× asciimath:[1/2]*
 |*-30.10 cB*
-
-|-60%
-|×0.40
-|-39.79 cB
-
-|-65%
-|×0.35
-|-45.59 cB
-
-|-70%
-|×0.30
-|-52.29 cB
 
 |*-75%*
 |*×0.25*
@@ -184,10 +118,6 @@ The following table gives you a conversion between centibels and more familiar r
 |×0.20
 |-69.90 cB
 
-|-85%
-|×0.15
-|-82.39 cB
-
 |*-90%*
 |*×0.10*
 |*-100.00 cB*
@@ -196,18 +126,24 @@ The following table gives you a conversion between centibels and more familiar r
 |*×0.05*
 |*-130.10 cB*
 
-|-97%
-|×0.03
-|-152.29 cB
-
-|-98%
-|×0.02
-|-169.90 cB
-
 |*-99%*
 |*×0.01*
 |*-200.00 cB*
 |===
+
+
+[TIP]
+====
+**RULES OF THUMB**
+
+* **+30 cB** corresponds to a **multiplication by 2** (+100%)
+* **-30 cB** corresponds to a **division by 2** (-50%)
+* **-48 cB** corresponds to a **division by 3** (-66%)
+* **-60 cB** corresponds to a **division by 4** (-75%)
+* **-70 cB** corresponds to a **division by 5** (-80%)
+* **-100 cB** corresponds to a **division by 10** (-90%)
+
+====
 
 
 == Problem: compounded reductions are misrepresented ==
@@ -234,6 +170,11 @@ In particular, using centibels tends to reveal the following challenge: _even hi
 
 ====
 
+
+=== Diminishing returns
+
+.When reducing emissions, the first 10% of progress are usually much less expensive than the last. Centibels naturally account for this reality.
+image::cb-rcpt-jumps.png[width=100%]
 
 
 == Example: reducing emissions from cement ==
@@ -374,7 +315,42 @@ FIXME
 
 == Example: the Kaya equation ==
 
-FIXME
+The Kaya equation describes the GHG emissions of a society by decomposing them into the following 4 factors:
+
+[latexmath]
+++++
+\text{GHG} = \frac{\text{GHG}}{E} \times \frac{E}{\text{GDP}} \times \frac{\text{GDP}}{\text{Pop}} \times \text{Pop}
+++++
+
+The factors are:
+
+* latexmath:[\text{Pop}] : the *population size* (in persons)
+* latexmath:[\frac{\text{GDP}}{\text{Pop}}] : the *GDP per capita* (in $/person)
+  - can be loosely interpreted as the average "standard of living" (how much economic production each person enjoys on average), with important caveats in said interpretation.
+* latexmath:[\frac{E}{\text{GDP}}] : the *energy intensity of economic production* (in kWh/$)
+  - in English: how much energy is needed to produce $1 of added value (on average).
+* latexmath:[\frac{\text{GHG}}{E}] : the *carbon content of energy* (in gCO₂eq/kWh)
+  - in English: how much CO₂ is emitted when consuming 1kWh of energy (on average).
+
+
+Because the Kaya equation is a multiplicative chain, we can gain insights by discussing it in terms of centibels. Concretely, if we aim to reduce GHG emissions at a pace of -2.89 cB/year, then all 4 factors must vary each such that their variations sum to -2.89 cB/year.
+
+Importantly, if some of the 4 factors are _increasing_ rather than decreasing, then they play adversarially to reducing GHG emissions, adding to the burden on the other factors.
+
+For example, if GDP per capita increases by +1 cB/year, then the burden of reduction on the other 3 factors is now -3.89 cB/year. Likewise, a growing population adds to the challenge of reducing GHG emissions. This is illustrated in the following figure:
+
+.Demographic and economic growth add to the speed requirements for the decarbonization of the economy
+image::kaya-cB-degrowth.svg[]
+
+Today, when discussing the environmental transition, the first two factors get most of the attention. For example, replacing fossil fuels with renewable or nuclear energy sources reduces latexmath:[\frac{\text{GHG}}{E}]. Likewise, making our economy more _energy-efficient_ (for example: replacing air travel with train travel, enhancing the fuel economy of cars, replacing radiators with heat pumps, or redirecting our leisure expenses from watching online video to reading books) reduces latexmath:[\frac{E}{\text{GDP}}].
+
+You might think that achieving a fast pace of reduction on latexmath:[\frac{\text{GHG}}{E}] is easy, thanks to renewable energy sources: after all, the carbon content of wind electricity is a good -100 cB below that of coal, even when accounting for storage. But this analysis overlooks the following issues:
+
+. Electricity production only accounts for about 40% of GHG emissions, and electrifying the other energy uses is much more work than just replacing power plants.
+. The sheer scale of the electicity production to substitute is challenging in itself, posing in particular difficulties of material supply.
+. About 30% of GHG emissions are not related to energy consumption at all (in particular from agriculture, as well as the cement and metallurgy industries).
+
+
 
 
 == Example: saving fuel on cargo ships ==
