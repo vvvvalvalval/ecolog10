@@ -396,7 +396,7 @@ Of course, such a change would have drawbacks: for example personel costs would 
 ====
 **KEY TAKEWAY**
 
-In some situations, describing the effects of various actions in centibels can help us discover and quantify emissions reduction opportunities, especially when they affect different factors in opposite ways.
+In some situations, the impact of reduction actions can become much easier to work out when quantifying them in centibels.
 ====
 
 
