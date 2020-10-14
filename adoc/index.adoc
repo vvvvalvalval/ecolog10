@@ -19,12 +19,9 @@ ____
 ====
 This website is still a work in progress. In particular, the following enhancements are planned:
 
-1. Visualizations
 1. Tutorial for computing _percentage <--> scale factor <--> centibels_ conversions.
 1. Interactive widget for the above.
 1. New section about caveats, limitations and workarounds
-1. New case study: car efficiency
-1. New case study: Kaya equation
 1. Alternate article for a scientific audience
 1. French translation
 
@@ -225,7 +222,7 @@ _By how much will we have reduced GHG emissions in 10 years?_
 
 ====
 
-Most people will either tell you that they don't know, or give the instinctive but incorrect answer of -64%. Those few who can find the correct formula of latexmath:[100 \times \left(1 - \left(1 - \frac{5.7}{100}\right)^{10}\right)] probably cannot compute it off the top of their heads. The fundamental issue here is that repeated applications of percentages is tricky.
+Most people will either tell you that they don't know, or give the instinctive but incorrect answer of -64%. Those few who can find the correct formula of latexmath:[100 \times \left(1 - \left(1 - \frac{6.4}{100}\right)^{10}\right)] probably cannot compute it off the top of their heads. The fundamental issue here is that successive applications of percentages is tricky.
 
 On the other hand, if we frame our objective as
 
@@ -350,7 +347,9 @@ You might think that achieving a fast pace of reduction on latexmath:[\frac{\tex
 . The sheer scale of the electicity production to substitute is challenging in itself, posing in particular difficulties of material supply.
 . About 30% of GHG emissions are not related to energy consumption at all (in particular from agriculture, as well as the cement and metallurgy industries).
 
+Can we do something about latexmath:[\frac{E}{\text{GDP}}], i.e make our economies less energy-intensive? To some extent, we're already doing it: for example, https://ourworldindata.org/grapher/energy-intensity-of-economies[some estimations] show that latexmath:[\frac{E}{\text{GDP}}] has decreased at a pace of -0.8 cB/year from 2005 to 2015 at the global levelfootnote:[Some countries have sustained much faster reductions of latexmath:[\frac{E}{\text{GDP}}]; unfortunately, this often doesn't point us towards any sustainable direction, because these achievements are made possible by energy trade. For instance, from 1998 to 2008, Norway has decreased its latexmath:[\frac{E}{\text{GDP}}] at an impressive pace of -3.5 cB/year... mostly thanks to growing North sea oil exports, while their territorial energy consumption remained constant.].
 
+People and governments tend to have strong feelings about demographic policies and economic growth; we will not debate here what objectives are acceptable regarding these factors, but it's important not to forget that they exist and can exert strong influence on GHG emissions, for better or for worse.
 
 
 == Example: saving fuel on cargo ships ==
@@ -426,3 +425,41 @@ When we frame the situation _**in centibels, these multiplications become additi
 [#cars-economy-centibels]
 .How various reduction actions might be combined to lowering car-driving emissions (numbers chosen arbitrarily).
 image::cars-economy-centibels.svg[]
+
+
+== Appendix: converting to / from centibels
+
+Denoting latexmath:[p] the relative percentage (e.g -75%), latexmath:[s] the corresponding scaling factor (e.g latexmath:[\times \frac{1}{4}]), and latexmath:[c] the corresponding centibels (e.g -60.2 cB), we have the following *conversion formulas*:
+
+
+[latexmath]
+++++
+s = 1 + \frac{p}{100}
+++++
+
+[latexmath]
+++++
+c = 100 \times \log(s)
+++++
+
+[latexmath]
+++++
+s = 10 ^{\frac{c}{100}}
+++++
+
+[latexmath]
+++++
+p = 100 \times (s - 1)
+++++
+
+Note that the first and last formulas are merely reminders about what relative percentages mean.
+
+Here are screenshots of converting between centibels and relative percentages on the calculator app of an Android phone:
+
+.A -17% variation translates to -8.09 cB.
+image::example-computing-rcpt-to-cB.png[]
+
+.A -38 cB variation translates to -58.3%.
+image::example-computing-cB-to-rpct.png[]
+
+Note that some computations involve a latexmath:[\log] function (pronounce: "logarithm"). There exist several logarithm functions; to make sure you're using the correct onefootnote:[known as the _base-10 logarithm_.], verify that latexmath:[\log(10) = 1].
