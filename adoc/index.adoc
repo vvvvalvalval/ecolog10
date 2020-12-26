@@ -14,7 +14,6 @@ ____
 We need a plan that adds up!
 ____
 
-
 [WARNING]
 ====
 This website is still a work in progress. In particular, the following enhancements are planned:
@@ -22,9 +21,13 @@ This website is still a work in progress. In particular, the following enhanceme
 1. Tutorial for computing _percentage <--> scale factor <--> centibels_ conversions.
 1. Interactive widget for the above.
 1. New section about caveats, limitations and workarounds
-1. Alternate article for a scientific audience
 1. French translation
 
+====
+
+[NOTE]
+====
+There is a link:centibels-logarithmic-representations-for-the-carbon-transition.html[companion technical article] for persons with a scientific background.
 ====
 
 

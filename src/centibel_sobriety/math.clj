@@ -23,3 +23,6 @@
   (* 100
     (- scalar 1)))
 
+(comment
+
+  *e)

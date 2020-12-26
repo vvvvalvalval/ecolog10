@@ -1,0 +1,295 @@
+:man-linkstyle: blue R <>
+:mansource: Asciidoctor
+:manversion: 1.0
+:manmanual: Asciidoctor
+:icons: font
+:imagesdir: ./img
+:stem:
+= Logarithmic representations for the carbon transition =
+
+[WARNING]
+====
+This website is still a work in progress. In particular, the following enhancements are planned:
+
+1. Tutorial for computing _percentage <--> scale factor <--> centibels_ conversions.
+1. Interactive widget for the above.
+1. New section about caveats, limitations and workarounds
+1. French translation
+
+====
+
+[NOTE]
+====
+There is also a link:index.html[broad-audience article] providing a less technical exposition of this topic.
+====
+
+== Carbon budgets and emission pathways
+
+It has been https://www.ipcc.ch/site/assets/uploads/2018/05/SYR_AR5_FINAL_full_wcover.pdf[estimated by the IPCC] that remaining below +2°C of global warming corresponds to the constraint that future CO₂ emissions should not exceed a certain "carbon budget" (estimated to around 650 GtonCO₂ at the time of writing, but the exact number is irrelevant to our analysis). In this light, it makes sense for various actors to plan their future emissions such that they don't accumulate beyond a certain threshold: we call this the Carbon Budget Problem.
+
+**The Carbon Budget Problem:** planning future emissions such that they don't exceed a certain threshold.
+
+Note that we are not talking about _annual emissions_ here: the limit is measured in 650 GtonCO₂, not in 650 GtonCO₂/year. In particular, this implies that yearly emissions must asymptotically near zero.
+
+
+=== Exponential-decay pathways
+
+
+Exponential-decay pathways are frequently used to communicate about reducing GHG emissions; they arise from admonitions such as: "to avoid depleting our carbon budget, we should reduce emissions by 5% each year compared to the previous year." In other words, exponential-decay pathways reduce emissions by a constant CAGR footnote:[Compound Annual Growth Rate].
+
+Formally, an _exponential-decay pathway_ starting at time latexmath:[t_0] plans a reduction of the annual emissions latexmath:[E(t)] given by the formula:
+
+[latexmath]
+++++
+E(t) = E(t_0) e^{- \frac{t}{T}} \quad \text{for } t \geq t_0
+++++
+
+in which latexmath:[T] is a duration constant (in years) that determines the "pace" of reduction (smaller is faster).
+
+The cumulated emissoins after latexmath:[t_0] are given by:
+
+[latexmath]
+++++
+\int_{t_0}^{+\infty} E(t) \,dt = T \cdot E(t_0)
+++++
+
+Therefore, if latexmath:[B_0] is the remaining carbon budget at latexmath:[t_0], this yields the constraint on latexmath:[T]
+
+[latexmath]
+++++
+T \leq T_{\text{max}} := \frac{B_0}{E(t_0)}
+++++
+
+In other words, latexmath:[T] must be no more than the time in which the Carbon Budget would be depleted if emissions levels were kept constant over time rather than reduced.
+
+=== Centibels-based characterization: constant centibel-speed
+
+In centibels, exponential-decay pathways take a very simple form: measured in centibels, the reduction in annual emissions levels is proportional to elapsed time, i.e **emissions are reduced at constant centibel-speed** (in cB/year).
+
+This is illustrated by the following chart:
+
+
+FIXME figure
+
+Indeed, denoting latexmath:[c_b(t)] the centivels-variation of emissions levels since latexmath:[t_0], we have:
+
+[latexmath]
+++++
+c_b(t) = 100 \cdot \log \frac {E(t)}{E(t_0)} = 100 \cdot \log e^{- \frac {t}{T}} = \frac{100}{\ln 10} \cdot \frac{-t}{T}
+++++
+
+The "centibel-speed" of reduction latexmath:[\dot{c}_b] is therefore given by:
+
+[latexmath]
+++++
+\dot{c}_b = \frac{-100}{T \ln 10}
+++++
+
+
+=== Delaying reduction, and the "rendez-vous point rule"
+
+It is frequently stressed that the more we delay in staarting to reduce GHG emissions, the faster we will need to reduce once we've started. Centibels allow for a simple mental model to turn this intuition into a quantitative guideline.
+
+Let us call _Pivotal Year_ the time latexmath:[t_P] at which our Carbon Budget would be exhausted if emissions levels remained constant. It can be proved that, whatever the time latexmath:[t_0 \leq t_P] at which we start reducing emissions by an exponential-decay pathway, and assuming emission levels remain constant before latexmath:[t_0], we have
+
+
+[latexmath]
+++++
+\frac{E(t_P)}{E(t_0)} = \frac{1}{e}
+++++
+
+when the pace of reduction is chosen to be the minimum required to avoid overshooting the Carbon Budget.
+
+In centibels, this constraint becomes:
+
+[latexmath]
+++++
+c_b(t_P) = 100 \cdot \log \frac{1}{e} = \frac{-100}{\ln 10} \approx -43.4 \text{ cB}
+++++
+
+This invariant provides a very simply guideline for adjusting the "speed" of emissions reductions: _"no matter when we start reducing, by the Pivot Year, we must have achieved a -43.4 cB reduction."_ In particular:
+
+* If we started reducing 10 years before the Pivot Year, we would need to reduce at a pace of -4.34 cB/year
+* If we started reducing 15 years before the Pivot Year, we would need to reduce at a pace of -2.89 cB/year
+* If we started reducing 5 years before the Pivot Year, we would need to reduce at a pace of -8.68 cB/year
+
+**Intuitive interpretation:** there is a "reduction mileage" of -43.4 cB to be walked before the Pivot Year, from which the required speed of reduction can be inferred.
+
+This is illustrated in the following chart:
+
+image::exp-decay-global-pathways.svg[width=100%]
+
+
+[WARNING]
+====
+**Caution:** we emphasize that this guideline only works if the reduction pathway is indeed exponential, which implies in particular a sharp decline in early years. The "-43.4 cB at Pivot Year" target is not in general sufficient to solve the Carbon Budget Problem. This guideline should be considered a mnemonic, not an objective.
+====
+
+
+=== Generalization to other reduction pathways
+
+"Rendez-vous point" rules as described in the previous section are not unique to exponential-decay pathway: in fact, every pathway for which delay gets compensated by a uniform increase in "playback speed" will have an invariant of the form
+
+[latexmath]
+++++
+\forall t_0 \lt t_p, \frac{E(t_P)}{E(t_0)} = C
+++++
+
+in which latexmath:[C] is a constant determined by the shape of the pathway.
+
+For example, rather than constant centibel-speed pathways (for which latexmath:[C = 1/e]), we could imagine _constant centibel-acceleration_ pathways footnote:[these would be shaped as the half of a bell curve], for which latexmath:[C = e^{-\frac{\pi}{4}}].
+
+
+== Converting centibels in your head
+
+In order to become proficient with centibels, being able to make quick and approximate conversions between centibels and classical representations, without using a calculator, is quite useful. We give a few guidelines to achieve that.
+
+
+=== Guideline 1: good-to-know centibel conversions
+The following table gives a few useful conversions to remember:
+
+[cols=3*, options="header"]
+|===
+|%
+|×
+|cB
+
+|+0 %
+|× asciimath:[1]
+|+0 cB
+
+|-50 %
+|× asciimath:[1/2]
+|-30.1 cB
+
+|-66.7 %
+|× asciimath:[1/3]
+|-48 cB
+
+|-90 %
+|× asciimath:[1/10]
+|-100 cB
+|===
+
+
+=== Guideline 2: via algebraic rules
+
+Recalling that centibels turn multiplications into additions, other conversions can be readily derived, for example:
+
+* -95 % = × asciimath:[5/100] = × asciimath:[1/20] = × asciimath:[1/2] = × asciimath:[1/10] = -30 cB -100 cB = -130 cB
+* × asciimath:[1/5] = × asciimath:[2/10] = × asciimath:[2] × asciimath:[1/10] = +30 cB -100 cB = -70 cB
+* -25 % = × asciimath:[3/4] = × asciimath:[3] × asciimath:[1/2] × asciimath:[1/2] = +48 cB -30 cB -30 cB = -12 cB
+
+
+=== Guideline 3: small variations
+
+FIXME introduce those symbols somewhere above
+
+For small variations (e.g between -5% and +5%), asciimath:[c_b] can be approximated to being proportional to asciimath:[p_%], the coefficient being latexmath:[\left(\frac{d p_{\%}}{d c_b}\right)_{c_b = 0} = \ln (10) \approx \frac{7}{3} \approx 2.30 \%.\text{cB}^{-1}], i.e:
+
+[latexmath]
+++++
+\text{For small } p_{\%} \text{,} \quad p_{\%} \approx \ln(10) \times c_b \approx 2.30 \times c_b \approx \frac{7}{3} \times c_b
+++++
+
+
+For example, latexmath:[-2 \text{ cB} \approx -4.6\%].
+
+[latexmath]
+++++
+\textrm{For small } c_b \text{,} \quad c_b \approx \frac{1}{\ln(10)} \times p_{\%} \approx 0.43 \times p_{\%} \approx \frac{3}{7} \times p_{\%}
+++++
+
+For example, latexmath:[-2\% \approx -0.86 \text{ cB}].
+
+
+== Are centibels accessible to everyone?
+
+A typical objection to logarithmic representations goes as follows: _"logarithms are too mathematically advanced to be understood outside of a few technical niches, so it's useless to communicate using centibels"._ And indeed, we do not plan on a widespread mastery of logarithms in time to tackle climate change.
+
+However, we argue that using centibels does not require learning the mathematical theory of logarithms, and is in fact much more accessible.
+
+In particular, presenting centibels as a _unit of measure_, to be manipulated like dollars, miles or kilograms, can provide a significant foothold to intuition. Forget about logarithms: just express the objectives and opportunities in centibels, and leave the rest to intuition.
+
+Admittedly, leaving aside the question of intellectual accessibility, percentages have over centibels the advantage of familiarity. That is true, but as we've seen (FIXME) this familiarity is double-edged: when applied to multiplicative models, percentages commonly lead to reasoning errors.
+
+In a similar line, consider hindu-arabic numerals (this handy notation for numbers, enabling us to write '3426' rather than 'three thousand two hundred forty-six' or 'MMMCCXLVI'). Almost everyone learns to use hindu-arabic numerals as soon as elementary school footnote:[that is of course where elementary schools exist.], yet almost no one learns the mathematical theory underlying them.
+
+
+== Centibels versus logarithmic scales
+
+Most centibels-based data visualizations are graphically equivalent to displaying one of the axes in a logarithmic scale. Indeed, behind both centibels and logarithmic scales, there lies a logarithmic transform.
+
+However, logarithmic scales can easily confuse an audience by the unusual fact that displayed quantities cannot be mapped to lengths on the chart, leaving the presenter with the challenge of explaining and justifying logarithmic scales to the audience.
+
+Centibels are less subject to this "leaky abstraction" problem: once the audience has accepted that centibels quantify change, they can be plotted in a way that is consistent with visual intuition.
+
+
+== Centibels as a proxy for reduction effort
+
+We now turn our attention to the problem of estimating the _effort_ or _cost_ of reducing GHG emissions. This is important in particular for planning emissions targets and the pathways to achieve them.
+
+First, let us note that the amount of avoided emissions is not proportional to the cost of avoiding them. For instance, when reducing a person's carbon footprint from 8 tonCO₂e/year to 2 tonCO₂e/year, transitioning from 8 to 6 tonCO₂e/year can be expected to be much easier than transitioning from 4 to 2 tonCO₂e/year, event though both transitions are 2 tonCO₂e/year reductions.
+
+Centibels naturally account for this "law of diminishing returns": in the above example, the first transition is a -12 cB variation, whereas the second is a -30 cB variation.
+
+We'll now provide theoritical support for how centibels can be a better proxy for reduction cost than avoided emissions.
+
+We model emissions reductions by a function latexmath:[x \mapsto G(x)], in which:
+
+* latexmath:[G(x)] is the GHG-intensity of the studied process, in tonCO₂e/FU (Functional Unit)
+* latexmath:[x \geq 0] is the effort / cost invested for reducing latexmath:[G].
+
+**Assumptions about latexmath:[G]:** obviously, we expect the function latexmath:[G] to be decreasing. What's more, as stated above, our "law of diminishing returns" is equivalent to latexmath:[G] being convex. Finally assuming that the studied process cannot result in negative GHG emissions, we expect latexmath:[G] to be positive.
+
+On their own, these assumptions don't imply that centibels are a better proxy for cost than avoided emissions.
+
+However, it's typically safe to make a much stronger assumption on latexmath:[G]:
+
+**Assumption A1:** denoting latexmath:[E := \frac{1}{G}] the _GHG-efficiency_ of the studied process, we assume that gaining latexmath:[+p\%] on latexmath:[E] costs more and more as latexmath:[E] increases, i.e that **the _marginal efficiency returns_ are decreasing.**
+
+This assumption can be formulated in the following equivalent ways:
+
+1. As we progress in efficiency, gaining latexmath:[+p\%] in efficiency costs more and more.
+1. As we progress in intensity, reducing intensity by latexmath:[-p\%] costs more and more.
+1. Sustaining a constant CAGR in efficiency costs more each year.
+1. The function latexmath:[x \mapsto \log \frac{E(x)}{E(0)}] is concave.
+1. The function latexmath:[x \mapsto \log \frac{G(x)}{G(0)}] is convex. (This is sometimes phrased as latexmath:[G] being _log-convex._)
+
+Under this assumption, it can be proved that it is always **strictly more accurate to (locally footnote:[Why are we restricting our estimations to extrapolations from local behaviour? We assume that future costs are difficult to foresee, such that only local variations of latexmath:[G(x)] are known: this is why the approximation ratios are the derivatives at latexmath:[x=0] latexmath:[\left(\frac{d x}{d c_b}\right)_{x=0}] and latexmath:[\left(\frac{d x}{d p_{\%}}\right)_{x=0}]]) estimate the reduction cost by a constant effort-per-centibels ratio latexmath:[\left(\frac{d x}{d c_b}\right)_{x=0}] than by a constant effort-per-avoided-emissions ratio latexmath:[\left(\frac{d x}{d p_{\%}}\right)_{x=0}].** More precisely, the actual cost will be underestimated by both approximations, but less so by the centibel-based approximation.
+
+The main objection we see to the realism of assumption A1 lies in threshold effects: in some situations, initial investments will not significantly reduce GHGH emissions, until a critical when they go down a cliff, such that latexmath:[G(x)] has a stair-shaped curve. Arguably, this does not recommend for or against centibels as a proxy for cost: it rather means that long-term cost cannot be extrapolated from marginal costs in such situations.
+
+FIXME figure
+
+There is cause to believe that hypothesis A1 is largely applicable in industrial settings. As historical evidence, consider the evolution of energy efficiency of computing hardware. For 50 years, the number of computer operations per dissipated energy has doubled every 1.6 years, an exponential trend identified as https://en.wikipedia.org/wiki/Koomey%27s_law[Koomey's Law], and understandably heralded as one of the most impressive trajectories in energy efficiency across all technology domains. From this exponential trend over time, it is safe to assume footnote:[Justification: an exponential time trend is is log-affine and thus log-convex as a function of time, and annual R&D investments in computing hardware can be expected to have been increasing over time] that this energy efficiency problem follows hypothesis A1, and most other industrial technologies can be expected to have faster-declining ROIs in energy efficiency.
+
+
+== Broad-scope GHG-accounting models are usually not multiplicative
+
+In general, we recommend against using centibels for describing "broad-scope" situations encompassing many diverse activities, such as describing the entire GHG footprint of a company or society.
+
+Indeed, we find that for such situations, accurate models are usually additive, not multiplicative (typically, GHG emissions are expressed as a long linear combinations of activity levels weighted by emission factors).
+
+It could be objected that the Kaya equation is a counter-example to the above recommendation, since it provides a multiplicative decomposition of the GHG emissions of an economy. However, it must be noted that the factors in the Kaya equation are merely global statistical aggregates, and do not map directly to physical mechanisms or concrete action levers: for example, although the Kaya Equation has a GHG/energy factor, a large fraction of the world's GHG emissions arise from non-energetic activities (deforestation, agricultural methane emissions, lime calcination).
+
+Therefore, our general recommendation is to restrict the use of centibels to situations narrow enough that emissions can be faithfully described by a homogeneous model.
+
+How can we reconcile these 2 views, the global use of tonCO₂e versus the local use of centibels? We imagine 2 approaches:
+
+* **Top-down:** objectives are assigned to each narrow scope, at which point centibels are used to quantify the the implications of those objectives.
+
+* **Bottom-up:** centibels are used to study the constraints, costs and opportunities of each narrow scopes (in tonCO₂); these possibilities are then aggregated into a global carbon strategy.
+
+Of course, a more realistic method might consist of moving back and forth between both approaches.
+
+
+== Limitations and corrections of multiplicative models
+
+As we have seen, centibels are suitable for multiplicative emissions models. It may happen, however, that we want to refine a multiplicative model by making an additive correction to it. For example, we might at first model the emissions of car-driving as proportional to driven distance, and then add a term accounting for the manufacturing of the car.
+
+As soon as such a correction is made, the model is no longer multiplicative, and the use of centibels becomes questionable. This raises the question: _are centibels too fragile to be relied upon?_
+
+Experience shows a very strong appeal for multiplicative models, even when they're grossly inaccurate. For example, researches will report emissions factors for photovoltaic electricity in gCO₂/kWh, despite the fact that the emissions of a photovoltaic panel are virtually unrelated to how much electrical energy we get from it; adopting such a model artificially adds significant uncertainty to estimating the lifecycle emissions of photovoltaic eletricity, yet this disadvantage is considered a reasonable price to pay for the usability of a multiplicative model.
+
+We do not systematically recommend for or against the use of simplistic multiplicative models for GHG emissions: this is a decision that has to be made for each application, as a tradeoff between accuracy and usability. We do recommend, however, that when accuracy is sacrificed the most be made of usability; in the case of multiplicative model, that may involve the use of logarithmic representations.
