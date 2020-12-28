@@ -200,7 +200,7 @@ To be more explicit: in this model, CO₂ emissions are given by the following f
 When using centibels, the above equation turns in to the 'budget problem' of splitting the -100cB reduction across our 3 factors. The following chart provides an example:
 
 [#cement-economy-centibels]
-.How various reduction actions might be combined to lowering emissions from cement (numbers chosen arbitrarily).
+.How various reduction actions might be combined to lower CO₂ emissions from cement (numbers chosen arbitrarily).
 image::cement-economy-centibels.svg[width=100%]
 
 [TIP]

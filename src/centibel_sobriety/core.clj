@@ -604,7 +604,116 @@
   *e)
 
 
-(def exp-decay-chart
+(def exp-decay-single-chart
+  (let [ref-year 2021
+        limit-year (+ ref-year (/ remaining-carbon-budget yearly-emissions-2019))]
+    {:$schema "https://vega.github.io/schema/vega-lite/v4.json",
+     :description "",
+     :title {:text "Exponential-decay emissions reduction pathway"
+             :align "center"
+             :anchor "middle"
+             :orient "bottom"
+             :baseline "top"}
+     :vconcat
+     [{:height 120 :width 480
+       :layer
+       [{:data {:values [{:t_0 (year->temporal ref-year)
+                          :t_l (year->temporal limit-year)
+                          :zero_emissions 0.
+                          :init_ghg_emissions yearly-emissions-2019
+                          :rem_carbon_budget remaining-carbon-budget}]}
+         :layer [{:mark {:type :rect}
+                  :encoding {:x {:field :t_0 :type "temporal"}
+                             :x2 {:field :t_l :type "temporal"}
+                             :y {:field :zero_emissions :type :quantitative}
+                             :y2 {:field :init_ghg_emissions :type :quantitative}
+                             :color {:value "red"}
+                             :opacity {:value 0.15}}}
+                 {:mark {:type "text",
+                         :align "left",
+                         :baseline "bottom",
+                         :dx 5
+                         :dy -20}
+                  :transform
+                  [{:calculate "['Remaining emissions budget:', format(datum.rem_carbon_budget, '.0f') + ' GtCO₂e as of ' + timeFormat(datum.t_0, '%Y/%m')]"
+                    :as :remaining_emissions_subtext}]
+                  :encoding {:x {:field :t_0 :type "temporal"}
+                             :y {:field :zero_emissions :type :quantitative}
+                             :text {:field :remaining_emissions_subtext}
+                             :color {:value "red"}
+                             :opacity {:value 0.6}}}]}
+        {:data {:values
+                (for [t (concat (range 2019 2045 0.1) [2045])
+                      :let [cb-red (if (< t ref-year)
+                                     0.
+                                     (*
+                                       exp-decay-limit-year-target-cB
+                                       (double
+                                         (/
+                                           (- t ref-year)
+                                           (- limit-year ref-year)))))]]
+                  {:t (year->temporal t)
+                   :yearly_ghg_emissions
+                   (-> cb-red
+                     (cB-to-scalar)
+                     (* yearly-emissions-2019))
+
+                   :red_start_year ref-year})}
+         :mark {:type :line
+                :interpolate :monotone}
+         :encoding {:x {:field :t, :type "temporal",
+                        :title "Time"}
+                    :y {:field :yearly_ghg_emissions, :type "quantitative"
+                        :title "CO₂ emissions (GtCO₂e/year)"}}}]}
+      {:height 180 :width 480
+       :layer
+       [{:data {:values
+                (for [t [2019
+                         ref-year
+                         limit-year
+                         2045]
+                      :let [cb-red (if (< t ref-year)
+                                     0
+                                     (* exp-decay-limit-year-target-cB
+                                       (double
+                                         (/
+                                           (- t ref-year)
+                                           (- limit-year ref-year)))))]]
+                  {:t (year->temporal t)
+                   :cB_red cb-red})}
+         :mark {:type :line
+                :interpolate :linear}
+         :encoding {:x {:field :t, :type "temporal",
+                        :title nil
+                        :axis {:orient "top"}},
+                    :y {:field :cB_red, :type "quantitative"
+                        :title "Reduction (cB)"}}}
+        {:data {:values
+                [(let [t 2045]
+                   {:t (year->temporal t)
+                    :red_start_year ref-year
+                    :cB_red
+                    (* exp-decay-limit-year-target-cB
+                      (double
+                        (/
+                          (- t ref-year)
+                          (- limit-year ref-year))))
+                    :cB_reduction_speed (/ exp-decay-limit-year-target-cB
+                                          (- limit-year ref-year))})]}
+         :transform
+         [{:calculate "format(datum.cB_reduction_speed, '.2f') + ' cB/year'"
+           :as :cB_reduction_speed_description}]
+         :encoding {:x {:field :t, :type "temporal"},
+                    :y {:field :cB_red, :type "quantitative"
+                        :title "Reduction (cB)"}},
+         :layer [{:mark {:type "text", :align "left", :dx 4}
+                  :encoding {:text
+                             {:field :cB_reduction_speed_description}}}]}]}]}))
+
+(oz/view! exp-decay-single-chart)
+
+
+(def exp-decay-multi-chart
   (let [ref-year 2020.7
         limit-year (+ ref-year (/ remaining-carbon-budget yearly-emissions-2019))
         redstart-years [2021
@@ -784,7 +893,7 @@
                       :text {:field :my_rule_subtext}}}]}]}]}))
 
 (comment
-  (oz/view! exp-decay-chart)
+  (oz/view! exp-decay-multi-chart)
   *e)
 
 
@@ -1597,10 +1706,74 @@
                                 :hover {:fillOpacity {:value 0.5}}}}]}],})
 
 
-(oz/view! kaya-time-chart)
-
 (comment
 
   (oz/view! kaya-time-chart)
 
+  *e)
+
+
+
+
+(def proxy-cost-sketch
+  {:$schema "https://vega.github.io/schema/vega-lite/v4.json",
+   :description "Various scenarios for constant centibel-speed (a.k.a 'exponential decay') emissions pathways",
+   :title {:text "Sketch: approximations of ROI in GHG-intensity reduction by local extrapolations"}
+   :height 150 :width 300
+   :data {:values
+          (let [A -1
+                B (/ 1. 5.)]
+            (for [x (range 0. 10. 1e-1)
+                  :let [;; NOTE this example function was chosen by assuming a implicit experience curve effect,
+                        ;; for which both the GHG-intensity and the invested R&D cost are proportional to the cost.
+                        Gx (Math/pow (+ 1 (* B x)) A)
+                        G*x (+ 1 (* A B x))
+                        G**x (Math/exp (* A B x))]
+                  m [{:ghg_intensity_curve "0 True G(x)"
+                      :reduction_cost x
+                      :ghg_intensity Gx
+                      :is_exact true}
+                     {:ghg_intensity_curve "1 cB-based approximation"
+                      :reduction_cost x
+                      :ghg_intensity G**x
+                      :is_exact false}
+                     {:ghg_intensity_curve "2 %-based approximation"
+                      :reduction_cost x
+                      :ghg_intensity G*x
+                      :is_exact false}]
+                  :when (<= 0 (:ghg_intensity m))]
+              m))}
+   :config {:axis {:ticks false
+                   :labels false
+                   :grid false}}
+   :layer
+   [{:mark {:type :line
+            :interpolate :monotone}
+     :transform [{:filter "datum.is_exact"}]
+     :encoding {:x {:field :reduction_cost, :type "quantitative",
+                    :title "Investment in reduction"}
+                :y {:field :ghg_intensity, :type "quantitative"
+                    :title "GHG intensity"}
+                :color {:field :ghg_intensity_curve,
+                        :type "nominal"
+                        :legend {:title nil
+                                 :labelExpr "slice(datum.value, 2)"}}
+                :strokeWidth {:value 2}}}
+    {:mark {:type :line
+            :interpolate :monotone}
+     :transform [{:filter "!datum.is_exact"}]
+     :encoding {:x {:field :reduction_cost, :type "quantitative",
+                    :title "Investment in reduction"}
+                :y {:field :ghg_intensity, :type "quantitative"
+                    :title "GHG intensity"}
+                :color {:field :ghg_intensity_curve,
+                        :type "nominal"
+                        :legend {:title nil
+                                 :labelExpr "slice(datum.value, 2)"}}
+                :strokeDash {:value [4 1]}
+                :strokeWidth {:value 1}}}]})
+
+
+(comment
+  (oz/view! proxy-cost-sketch)
   *e)

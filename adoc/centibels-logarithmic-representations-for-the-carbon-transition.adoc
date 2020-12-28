@@ -11,10 +11,10 @@
 ====
 This website is still a work in progress. In particular, the following enhancements are planned:
 
-1. Tutorial for computing _percentage <--> scale factor <--> centibels_ conversions.
-1. Interactive widget for the above.
-1. New section about caveats, limitations and workarounds
-1. French translation
+1. Abstract / summary
+1. Conclusion?
+1. Authors
+1. References
 
 ====
 
@@ -22,6 +22,196 @@ This website is still a work in progress. In particular, the following enhanceme
 ====
 There is also a link:index.html[broad-audience article] providing a less technical exposition of this topic.
 ====
+
+[[introduction]]
+== Introduction: quantifying reductions in centibels
+
+When modeling the GHG emissions or energy consumption of some activity, we are usually trying to assess how they vary under various (reduction) actions. When a positive quantity latexmath:[q] varies from an reference level latexmath:[q_0] to a new level latexmath:[q_1], we might commonly represent that variation by various numbers:
+
+* a **_scaling factor_:** latexmath:[s_\times := \frac{q_1}{q_0}]
+** Examples: ×1.25, ×0.25, ×0.5, ×1, ×0.1
+* a **_relative percentage_:** latexmath:[p_\% := 100 \cdot \frac{q_1}{q_0}]
+** Examples: +25%, -75%, -50%, +0%, -90%
+
+In this article, we introduce an alternative way of representing such a variation, lesser-known but arguably useful:
+
+[]
+====
+**Definition**
+
+The _centibel variation_ of a positive quantity varying from latexmath:[q_0] to latexmath:[q_1] is defined as:
+
+* **centibel variation:** latexmath:[c_b := 100 \cdot \log_{10} \frac{q_1}{q_0}]
+** Examples: +10 cB, -60 cB, -30 cB, +0 cB, -100 cB
+====
+
+
+As hinted by the name, such a quantification is measured in _centibels_ (a centibel is one 100th of a bel; bels measure base-10 logarithms. In formulas, centibels go with the constant latexmath:[\frac{100}{\ln 10}]. There is nothing novel about this.)
+
+.A range of reductions quantified both in centibels and relative percentages.
+image::rpct-centibels-conversion-ruler.svg[width=100%]
+
+In the previous formula, the latexmath:[\log_{10}] function is the _base-10 logarithm_, which we'll simply denote latexmath:[\log] in the rest of the article. The involvement of this function is why we call the centibel variation a 'logarithmic representation'. This function can be defined as:
+
+[latexmath]
+++++
+\forall r \gt 0, 10^{\log r} = r
+++++
+
+[NOTE]
+====
+We recall here some **relevant properties of the base-10 logarithm:** for any positive numbers latexmath:[x, y] and real number latexmath:[a],
+
+1. latexmath:[\log xy = \log x + \log y]
+1. latexmath:[\log \frac{1}{x} = -\log x]
+1. latexmath:[\log x^a = a \cdot \log x]
+1. latexmath:[\log 10 = 1]
+1. latexmath:[\log x \lt \log y \iff x < y]
+1. latexmath:[\log x = \frac{\ln x}{\ln 10}]
+1. latexmath:[\frac{d \log x}{d x} = \frac{1}{(\ln 10) x}]
+
+====
+
+Because of these properties, *logarithmic representations become interesting when the quantity of interest can be decomposed multiplicatively* into factors latexmath:[q^{(1)} , q^{(2)} , \dots q^{(L)}]:
+
+[latexmath]
+++++
+q = q^{(1)} \times q^{(2)} \times \cdots \times q^{(L)}
+++++
+
+[NOTE]
+====
+For example, such multiplicative decompositions are very common in "emissions factors" databases, in which emissions models are generally of the form:
+
+[latexmath]
+++++
+\text{GHG emissions} = \text{GHG intensity} \times \text{consumed quantity}
+++++
+
+The first factor is often called the _emission factor_.
+====
+
+When latexmath:[q] varies from latexmath:[q_0] to latexmath:[q_1], it follows from such a decomposition that:
+
+[latexmath]
+++++
+100 \cdot \log \frac{q_1}{q_0} = 100 \cdot \log \frac{q_1^{(1)}}{q_0^{(1)}} + 100 \cdot \log \frac{q_1^{(2)}}{q_0^{(2)}} + \cdots + 100 \cdot \log \frac{q_1^{(L)}}{q_0^{(L)}}
+++++
+
+This is interesting, because it means that **expressed in centibels, the variations of individual factors add up to the total variation.** (Such is not the case with relative percentages, which is a common cause of error when applying percentages to multiplicative models.)
+
+This additive decomposition of compounded variations is valuable, because humans have a good intuition for quantities that add, but a poor intuition for quantities that multiply: additive quantities can be easily visualized by depicting them as lengths or displacements (this is the principle underlying most data visualization methods), and can be intuitively manipulated like ordinary extensive quantities (such as dollars, gallongs, kilograms, megabytes, etc.)
+
+As an example, consider the following emissions model for cement production:
+
+[]
+====
+*Example: reducing CO₂ emissions from cement*
+
+Assume that we want to reduce CO₂ emissions from cement in a given sector of civil engineering; planning to divide them by 10 (-100 cB).
+
+We decompose these emissions into the following factors:
+
+* *CO₂ intensity* (tonCO₂e/ton): how much CO₂ is emitted per unit mass of cement.
+* *Construction density* (ton/m²): how much cement is used per unit constructed area.
+* *Usage* (m²): how much area is constructed.
+
+This decomposition corresponds to the following formula
+
+[latexmath]
+++++
+\text{CO₂ emissions} = \text{CO₂ intensity} \times \text{Construction density} \times \text{Usage}
+++++
+
+Given our reduction objective of -100 cB, we can then allocate reductions on each factor, as illustrated by the following chart:
+
+[#cement-economy-centibels]
+.How various reduction actions might be combined to lower CO₂ emissions from cement (numbers chosen arbitrarily).
+image::cement-economy-centibels.svg[width=100%]
+
+
+Notice how this problem, when expressed in centibels, turns into a "budget problem": each factor must contribute an "income" of reduction in centibels, so as to achieve the reduction objective.
+
+====
+
+We see other potential benefits to centibels, detailed in the next sections:
+
+* when modeling emissions as power laws,
+* for exponential-decay emissions pathways,
+* as a proxy for reduction cost.
+
+
+== Power laws
+
+*_Power laws_* generalize over multiplicative models via decompositions of the form:
+
+[latexmath]
+++++
+q = q_1^{e_1} \times q_2^{e_2} \times \dots \times q_L^{e_L}
+++++
+
+in which each exponent latexmath:[e_i] is a real constant, called the _elasticity_ of latexmath:[q] in factor latexmath:[q_i].
+
+Observe that taking the logarithm turns such a decomposition into a linear combination:
+
+[latexmath]
+++++
+\log q = e_1 \log q_1 + e_2 \log q_2 + \dots + e_L \log q_L
+++++
+
+As a consequence, when considering levers that act on the factors latexmath:[q_i], quantifying these actions in centibels can make it very straightforward to work out their impact, as illustrated by the following example on cargo ship emissions:
+
+
+[]
+====
+**Example: reducing emissions of cargo ships by slow-steaming**
+
+Assume that we are operating a fleet of cargo ships; by adjusting the number and speed of cargo ships, we want to minimize GHG emissions while achieving a certain _transportation throughput_.
+
+
+GHG emissions and transportation throughput are modeled by power laws:
+
+[latexmath]
+++++
+\text{transportation throughput} = A \times \text{fleet size} \times \text{ship speed}
+++++
+
+
+[latexmath]
+++++
+\text{GHG emissions} = B \times \text{fleet size} \times (\text{ship speed})^3
+++++
+
+We wonder if, by reducing speed while increasing fleet size, we can reduce GHG emissions, while preserving transportation throughput.
+
+Because we are dealing with power laws, framing the problem in centibels makes it elementary to work out from the elasticities:
+
+[cols=3*, options="header"]
+|===
+|Action
+|Impact on throughput
+|Impact on GHG emissions
+
+|-1 cB speed
+|-1 cB
+|-3 cB
+
+|+1 cB fleet size
+|+1 cB
+|+1 cB
+
+|**Both actions**
+|**+0 cB**
+|**-2 cB**
+|===
+
+Therefore, the answer is _yes_, a reduction in ship speed compensated by an increase in fleet size can preserve transportation throughput, while reducing GHG emissions. Also observe that:
+
+1. The answer is quantitative, not just qualitative.
+2. There is no sign of logarithms or exponentiation in the above table; it is potentially very accessible to a decision maker with little scientific background.
+
+====
+
 
 == Carbon budgets and emission pathways
 
@@ -69,7 +259,8 @@ In centibels, exponential-decay pathways take a very simple form: measured in ce
 This is illustrated by the following chart:
 
 
-FIXME figure
+image::exp-decay-pathway.svg[width=100%]
+
 
 Indeed, denoting latexmath:[c_b(t)] the centivels-variation of emissions levels since latexmath:[t_0], we have:
 
@@ -90,7 +281,7 @@ The "centibel-speed" of reduction latexmath:[\dot{c}_b] is therefore given by:
 
 It is frequently stressed that the more we delay in staarting to reduce GHG emissions, the faster we will need to reduce once we've started. Centibels allow for a simple mental model to turn this intuition into a quantitative guideline.
 
-Let us call _Pivotal Year_ the time latexmath:[t_P] at which our Carbon Budget would be exhausted if emissions levels remained constant. It can be proved that, whatever the time latexmath:[t_0 \leq t_P] at which we start reducing emissions by an exponential-decay pathway, and assuming emission levels remain constant before latexmath:[t_0], we have
+Let us call _Pivot Year_ the time latexmath:[t_P] at which our Carbon Budget would be exhausted if emissions levels remained constant. It can be proved that, whatever the time latexmath:[t_0 \leq t_P] at which we start reducing emissions by an exponential-decay pathway, and assuming emission levels remain constant before latexmath:[t_0], we have
 
 
 [latexmath]
@@ -140,7 +331,107 @@ in which latexmath:[C] is a constant determined by the shape of the pathway.
 For example, rather than constant centibel-speed pathways (for which latexmath:[C = 1/e]), we could imagine _constant centibel-acceleration_ pathways footnote:[these would be shaped as the half of a bell curve], for which latexmath:[C = e^{-\frac{\pi}{4}}].
 
 
-== Converting centibels in your head
+== Centibels as a proxy for reduction effort
+
+We now turn our attention to the problem of estimating the _effort_ or _cost_ of reducing GHG emissions. This is important in particular for planning emissions targets and the pathways to achieve them.
+
+First, let us note that the amount of avoided emissions is not proportional to the cost of avoiding them. For instance, when reducing a person's carbon footprint from 8 tonCO₂e/year to 2 tonCO₂e/year, transitioning from 8 to 6 tonCO₂e/year can be expected to be much easier than transitioning from 4 to 2 tonCO₂e/year, event though both transitions are 2 tonCO₂e/year reductions.
+
+Centibels naturally account for this "law of diminishing returns": in the above example, the first transition is a -12 cB variation, whereas the second is a -30 cB variation.
+
+We'll now provide theoritical support for how centibels can be a better proxy for reduction cost than avoided emissions.
+
+We model emissions reductions by a function latexmath:[x \mapsto G(x)], in which:
+
+* latexmath:[G(x)] is the GHG-intensity of the studied process, in tonCO₂e/FU (Functional Unit)
+* latexmath:[x \geq 0] is the effort / cost invested for reducing latexmath:[G].
+
+**Assumptions about latexmath:[G]:** obviously, we expect the function latexmath:[G] to be decreasing. What's more, as stated above, our "law of diminishing returns" is equivalent to latexmath:[G] being convex. Finally assuming that the studied process cannot result in negative GHG emissions, we expect latexmath:[G] to be positive.
+
+On their own, these assumptions don't imply that centibels are a better proxy for cost than avoided emissions.
+
+However, it's typically safe to make a much stronger assumption on latexmath:[G]:
+
+**Assumption A1:** denoting latexmath:[E := \frac{1}{G}] the _GHG-efficiency_ of the studied process, we assume that gaining latexmath:[+p\%] on latexmath:[E] costs more and more as latexmath:[E] increases, i.e that **the _marginal efficiency returns_ are decreasing.**
+
+This assumption can be formulated in the following equivalent ways:
+
+1. As we progress in efficiency, gaining latexmath:[+p\%] in efficiency costs more and more.
+1. As we progress in intensity, reducing intensity by latexmath:[-p\%] costs more and more.
+1. Sustaining a constant CAGR in efficiency costs more each year.
+1. The function latexmath:[x \mapsto \log \frac{E(x)}{E(0)}] is concave.
+1. The function latexmath:[x \mapsto \log \frac{G(x)}{G(0)}] is convex. (This is sometimes phrased as latexmath:[G] being _log-convex._)
+
+Under this assumption, it can be proved that it is always **strictly more accurate to (locally footnote:[Why are we restricting our estimations to extrapolations from local behaviour? We assume that future costs are difficult to foresee, such that only local variations of latexmath:[G(x)] are known: this is why the approximation ratios are the derivatives at latexmath:[x=0] latexmath:[\left(\frac{d x}{d c_b}\right)_{x=0}] and latexmath:[\left(\frac{d x}{d p_{\%}}\right)_{x=0}]]) estimate the reduction cost by a constant effort-per-centibels ratio latexmath:[\left(\frac{d x}{d c_b}\right)_{x=0}] than by a constant effort-per-avoided-emissions ratio latexmath:[\left(\frac{d x}{d p_{\%}}\right)_{x=0}].** More precisely, the actual cost will be underestimated by both approximations, but less so by the centibel-based approximation. This is summarized by the following sketch:
+
+image::sketch-ghg-intensity-extrapolations.svg[width=100%]
+
+The main objection we see to the realism of assumption A1 lies in threshold effects: in some situations, initial investments will not significantly reduce GHG emissions, until a critical when they go down a cliff, such that latexmath:[G(x)] has a stair-shaped curve. Arguably, this does not recommend for or against centibels as a proxy for cost: it rather means that long-term cost cannot be extrapolated from marginal costs in such situations.
+
+There is cause to believe that hypothesis A1 is largely applicable in industrial settings. As historical evidence, consider the evolution of energy efficiency of computing hardware. For 50 years, the number of computer operations per dissipated energy has doubled every 1.6 years, an exponential trend identified as https://en.wikipedia.org/wiki/Koomey%27s_law[Koomey's Law], and understandably heralded as one of the most impressive trajectories in energy efficiency across all technology domains. From this exponential trend over time, it is safe to assume footnote:[Justification: an exponential time trend is is log-affine and thus log-convex as a function of time, and annual R&D investments in computing hardware can be expected to have been increasing over time] that this energy efficiency problem follows hypothesis A1, and most other industrial technologies can be expected to have faster-declining ROIs in energy efficiency.
+
+
+
+
+
+== Applicability and limitations
+
+=== Broad-scope GHG-accounting models are usually not multiplicative
+
+In general, we recommend against using centibels for describing "broad-scope" situations encompassing many diverse activities, such as describing the entire GHG footprint of a company or society.
+
+Indeed, we find that for such situations, accurate models are usually additive, not multiplicative (typically, GHG emissions are expressed as a long linear combinations of activity levels weighted by emission factors).
+
+It could be objected that the Kaya equation is a counter-example to the above recommendation, since it provides a multiplicative decomposition of the GHG emissions of an economy. However, it must be noted that the factors in the Kaya equation are merely global statistical aggregates, and do not map directly to physical mechanisms or concrete action levers: for example, although the Kaya Equation has a GHG/energy factor, a large fraction of the world's GHG emissions arise from non-energetic activities (deforestation, agricultural methane emissions, lime calcination).
+
+Therefore, our general recommendation is to restrict the use of centibels to situations narrow enough that emissions can be faithfully described by a homogeneous model.
+
+How can we reconcile these 2 views, the global use of tonCO₂e versus the local use of centibels? We imagine 2 approaches:
+
+* **Top-down:** objectives are assigned to each narrow scope, at which point centibels are used to quantify the the implications of those objectives.
+
+* **Bottom-up:** centibels are used to study the constraints, costs and opportunities of each narrow scopes (in tonCO₂); these possibilities are then aggregated into a global carbon strategy.
+
+Of course, a more realistic method might consist of moving back and forth between both approaches.
+
+
+=== Limitations and corrections of multiplicative models
+
+As we have seen, centibels are suitable for multiplicative emissions models. It may happen, however, that we want to refine a multiplicative model by making an additive correction to it. For example, we might at first model the emissions of car-driving as proportional to driven distance, and then add a term accounting for the manufacturing of the car.
+
+As soon as such a correction is made, the model is no longer multiplicative, and the use of centibels becomes questionable. This raises the question: _are centibels too fragile to be relied upon?_
+
+Experience shows a very strong appeal for multiplicative models, even when they're grossly inaccurate. For example, researches will report emissions factors for photovoltaic electricity in gCO₂/kWh, despite the fact that the emissions of a photovoltaic panel are virtually unrelated to how much electrical energy we get from it; adopting such a model artificially adds significant uncertainty to estimating the lifecycle emissions of photovoltaic eletricity, yet this disadvantage is considered a reasonable price to pay for the usability of a multiplicative model.
+
+We do not systematically recommend for or against the use of simplistic multiplicative models for GHG emissions: this is a decision that has to be made for each application, as a tradeoff between accuracy and usability. We do recommend, however, that when accuracy is sacrificed the most be made of usability; in the case of multiplicative model, that may involve the use of logarithmic representations.
+
+
+
+=== Centibels versus logarithmic scales
+
+Most centibels-based data visualizations are graphically equivalent to displaying one of the axes in a logarithmic scale. Indeed, behind both centibels and logarithmic scales, there lies a logarithmic transform.
+
+However, logarithmic scales can easily confuse an audience by the unusual fact that displayed quantities cannot be mapped to lengths on the chart, leaving the presenter with the challenge of explaining and justifying logarithmic scales to the audience.
+
+Centibels are less subject to this "leaky abstraction" problem: once the audience has accepted that centibels quantify change, they can be plotted in a way that is consistent with visual intuition.
+
+
+=== Are centibels accessible to everyone?
+
+A typical objection to logarithmic representations goes as follows: _"logarithms are too mathematically advanced to be understood outside of a few technical niches, so it's useless to communicate using centibels"._ And indeed, we do not plan on a widespread mastery of logarithms in time to tackle climate change.
+
+However, we argue that using centibels does not require learning the mathematical theory of logarithms, and is in fact much more accessible.
+
+In particular, presenting centibels as a _unit of measure_, to be manipulated like dollars, miles or kilograms, can provide a significant foothold to intuition. Forget about logarithms: just express the objectives and opportunities in centibels, and leave the rest to intuition.
+
+Admittedly, leaving aside the question of intellectual accessibility, percentages have over centibels the advantage of familiarity. That is true, but this familiarity is double-edged: when applied to multiplicative models, percentages commonly lead to reasoning errors.
+
+In a similar line, consider hindu-arabic numerals (this handy notation for numbers, enabling us to write '3426' rather than 'three thousand two hundred forty-six' or 'MMMCCXLVI'). Almost everyone learns to use hindu-arabic numerals as soon as elementary school footnote:[that is of course where elementary schools exist.], yet almost no one learns the mathematical theory underlying them.
+
+
+
+
+== Annex: converting centibels in your head
 
 In order to become proficient with centibels, being able to make quick and approximate conversions between centibels and classical representations, without using a calculator, is quite useful. We give a few guidelines to achieve that.
 
@@ -183,7 +474,7 @@ Recalling that centibels turn multiplications into additions, other conversions 
 
 === Guideline 3: small variations
 
-FIXME introduce those symbols somewhere above
+In this section, asciimath:[c_b] and asciimath:[p_%] respectively denote the centibels variation and the relative percentage for a given variation, as defined in the <<introduction,introduction>>.
 
 For small variations (e.g between -5% and +5%), asciimath:[c_b] can be approximated to being proportional to asciimath:[p_%], the coefficient being latexmath:[\left(\frac{d p_{\%}}{d c_b}\right)_{c_b = 0} = \ln (10) \approx \frac{7}{3} \approx 2.30 \%.\text{cB}^{-1}], i.e:
 
@@ -201,95 +492,3 @@ For example, latexmath:[-2 \text{ cB} \approx -4.6\%].
 ++++
 
 For example, latexmath:[-2\% \approx -0.86 \text{ cB}].
-
-
-== Are centibels accessible to everyone?
-
-A typical objection to logarithmic representations goes as follows: _"logarithms are too mathematically advanced to be understood outside of a few technical niches, so it's useless to communicate using centibels"._ And indeed, we do not plan on a widespread mastery of logarithms in time to tackle climate change.
-
-However, we argue that using centibels does not require learning the mathematical theory of logarithms, and is in fact much more accessible.
-
-In particular, presenting centibels as a _unit of measure_, to be manipulated like dollars, miles or kilograms, can provide a significant foothold to intuition. Forget about logarithms: just express the objectives and opportunities in centibels, and leave the rest to intuition.
-
-Admittedly, leaving aside the question of intellectual accessibility, percentages have over centibels the advantage of familiarity. That is true, but as we've seen (FIXME) this familiarity is double-edged: when applied to multiplicative models, percentages commonly lead to reasoning errors.
-
-In a similar line, consider hindu-arabic numerals (this handy notation for numbers, enabling us to write '3426' rather than 'three thousand two hundred forty-six' or 'MMMCCXLVI'). Almost everyone learns to use hindu-arabic numerals as soon as elementary school footnote:[that is of course where elementary schools exist.], yet almost no one learns the mathematical theory underlying them.
-
-
-== Centibels versus logarithmic scales
-
-Most centibels-based data visualizations are graphically equivalent to displaying one of the axes in a logarithmic scale. Indeed, behind both centibels and logarithmic scales, there lies a logarithmic transform.
-
-However, logarithmic scales can easily confuse an audience by the unusual fact that displayed quantities cannot be mapped to lengths on the chart, leaving the presenter with the challenge of explaining and justifying logarithmic scales to the audience.
-
-Centibels are less subject to this "leaky abstraction" problem: once the audience has accepted that centibels quantify change, they can be plotted in a way that is consistent with visual intuition.
-
-
-== Centibels as a proxy for reduction effort
-
-We now turn our attention to the problem of estimating the _effort_ or _cost_ of reducing GHG emissions. This is important in particular for planning emissions targets and the pathways to achieve them.
-
-First, let us note that the amount of avoided emissions is not proportional to the cost of avoiding them. For instance, when reducing a person's carbon footprint from 8 tonCO₂e/year to 2 tonCO₂e/year, transitioning from 8 to 6 tonCO₂e/year can be expected to be much easier than transitioning from 4 to 2 tonCO₂e/year, event though both transitions are 2 tonCO₂e/year reductions.
-
-Centibels naturally account for this "law of diminishing returns": in the above example, the first transition is a -12 cB variation, whereas the second is a -30 cB variation.
-
-We'll now provide theoritical support for how centibels can be a better proxy for reduction cost than avoided emissions.
-
-We model emissions reductions by a function latexmath:[x \mapsto G(x)], in which:
-
-* latexmath:[G(x)] is the GHG-intensity of the studied process, in tonCO₂e/FU (Functional Unit)
-* latexmath:[x \geq 0] is the effort / cost invested for reducing latexmath:[G].
-
-**Assumptions about latexmath:[G]:** obviously, we expect the function latexmath:[G] to be decreasing. What's more, as stated above, our "law of diminishing returns" is equivalent to latexmath:[G] being convex. Finally assuming that the studied process cannot result in negative GHG emissions, we expect latexmath:[G] to be positive.
-
-On their own, these assumptions don't imply that centibels are a better proxy for cost than avoided emissions.
-
-However, it's typically safe to make a much stronger assumption on latexmath:[G]:
-
-**Assumption A1:** denoting latexmath:[E := \frac{1}{G}] the _GHG-efficiency_ of the studied process, we assume that gaining latexmath:[+p\%] on latexmath:[E] costs more and more as latexmath:[E] increases, i.e that **the _marginal efficiency returns_ are decreasing.**
-
-This assumption can be formulated in the following equivalent ways:
-
-1. As we progress in efficiency, gaining latexmath:[+p\%] in efficiency costs more and more.
-1. As we progress in intensity, reducing intensity by latexmath:[-p\%] costs more and more.
-1. Sustaining a constant CAGR in efficiency costs more each year.
-1. The function latexmath:[x \mapsto \log \frac{E(x)}{E(0)}] is concave.
-1. The function latexmath:[x \mapsto \log \frac{G(x)}{G(0)}] is convex. (This is sometimes phrased as latexmath:[G] being _log-convex._)
-
-Under this assumption, it can be proved that it is always **strictly more accurate to (locally footnote:[Why are we restricting our estimations to extrapolations from local behaviour? We assume that future costs are difficult to foresee, such that only local variations of latexmath:[G(x)] are known: this is why the approximation ratios are the derivatives at latexmath:[x=0] latexmath:[\left(\frac{d x}{d c_b}\right)_{x=0}] and latexmath:[\left(\frac{d x}{d p_{\%}}\right)_{x=0}]]) estimate the reduction cost by a constant effort-per-centibels ratio latexmath:[\left(\frac{d x}{d c_b}\right)_{x=0}] than by a constant effort-per-avoided-emissions ratio latexmath:[\left(\frac{d x}{d p_{\%}}\right)_{x=0}].** More precisely, the actual cost will be underestimated by both approximations, but less so by the centibel-based approximation.
-
-The main objection we see to the realism of assumption A1 lies in threshold effects: in some situations, initial investments will not significantly reduce GHGH emissions, until a critical when they go down a cliff, such that latexmath:[G(x)] has a stair-shaped curve. Arguably, this does not recommend for or against centibels as a proxy for cost: it rather means that long-term cost cannot be extrapolated from marginal costs in such situations.
-
-FIXME figure
-
-There is cause to believe that hypothesis A1 is largely applicable in industrial settings. As historical evidence, consider the evolution of energy efficiency of computing hardware. For 50 years, the number of computer operations per dissipated energy has doubled every 1.6 years, an exponential trend identified as https://en.wikipedia.org/wiki/Koomey%27s_law[Koomey's Law], and understandably heralded as one of the most impressive trajectories in energy efficiency across all technology domains. From this exponential trend over time, it is safe to assume footnote:[Justification: an exponential time trend is is log-affine and thus log-convex as a function of time, and annual R&D investments in computing hardware can be expected to have been increasing over time] that this energy efficiency problem follows hypothesis A1, and most other industrial technologies can be expected to have faster-declining ROIs in energy efficiency.
-
-
-== Broad-scope GHG-accounting models are usually not multiplicative
-
-In general, we recommend against using centibels for describing "broad-scope" situations encompassing many diverse activities, such as describing the entire GHG footprint of a company or society.
-
-Indeed, we find that for such situations, accurate models are usually additive, not multiplicative (typically, GHG emissions are expressed as a long linear combinations of activity levels weighted by emission factors).
-
-It could be objected that the Kaya equation is a counter-example to the above recommendation, since it provides a multiplicative decomposition of the GHG emissions of an economy. However, it must be noted that the factors in the Kaya equation are merely global statistical aggregates, and do not map directly to physical mechanisms or concrete action levers: for example, although the Kaya Equation has a GHG/energy factor, a large fraction of the world's GHG emissions arise from non-energetic activities (deforestation, agricultural methane emissions, lime calcination).
-
-Therefore, our general recommendation is to restrict the use of centibels to situations narrow enough that emissions can be faithfully described by a homogeneous model.
-
-How can we reconcile these 2 views, the global use of tonCO₂e versus the local use of centibels? We imagine 2 approaches:
-
-* **Top-down:** objectives are assigned to each narrow scope, at which point centibels are used to quantify the the implications of those objectives.
-
-* **Bottom-up:** centibels are used to study the constraints, costs and opportunities of each narrow scopes (in tonCO₂); these possibilities are then aggregated into a global carbon strategy.
-
-Of course, a more realistic method might consist of moving back and forth between both approaches.
-
-
-== Limitations and corrections of multiplicative models
-
-As we have seen, centibels are suitable for multiplicative emissions models. It may happen, however, that we want to refine a multiplicative model by making an additive correction to it. For example, we might at first model the emissions of car-driving as proportional to driven distance, and then add a term accounting for the manufacturing of the car.
-
-As soon as such a correction is made, the model is no longer multiplicative, and the use of centibels becomes questionable. This raises the question: _are centibels too fragile to be relied upon?_
-
-Experience shows a very strong appeal for multiplicative models, even when they're grossly inaccurate. For example, researches will report emissions factors for photovoltaic electricity in gCO₂/kWh, despite the fact that the emissions of a photovoltaic panel are virtually unrelated to how much electrical energy we get from it; adopting such a model artificially adds significant uncertainty to estimating the lifecycle emissions of photovoltaic eletricity, yet this disadvantage is considered a reasonable price to pay for the usability of a multiplicative model.
-
-We do not systematically recommend for or against the use of simplistic multiplicative models for GHG emissions: this is a decision that has to be made for each application, as a tradeoff between accuracy and usability. We do recommend, however, that when accuracy is sacrificed the most be made of usability; in the case of multiplicative model, that may involve the use of logarithmic representations.
