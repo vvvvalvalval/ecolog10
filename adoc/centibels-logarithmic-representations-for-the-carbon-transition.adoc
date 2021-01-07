@@ -9,19 +9,20 @@
 
 [WARNING]
 ====
-This website is still a work in progress. In particular, the following enhancements are planned:
+This article is still a work in progress. In particular, the following enhancements are planned:
 
-1. Abstract / summary
 1. Conclusion?
 1. Authors
 1. References
 
 ====
 
-[NOTE]
-====
-There is also a link:index.html[broad-audience article] providing a less technical exposition of this topic.
-====
+This article presents ways of reasoning and communicating about reducing GHG emissions and energy consumption, which at the time of writing are not in common use. Starting from the observation that many common models for GHG emissions are essentially multiplicative, we describe how to use logarithmic representations for approaching various emissions reduction problems in a straightforward way.
+
+To make things concrete, we propose to use _centibels_ (a unit of measure for base-10 logarithms, similar in nature to the decibels used in acoustics and eletrical engineering) as a measure of variation in GHG emissions or related quantities, as an alternative to physical units or percentages.
+
+Despite their abstract definition, we suggest that centibels might in fact _improve_ the accessibility of environmental transition problems to a broad audience, being a conceptually tangible unit of measure that delivers the practical benefits of logarithms while dispensing with the need to actually teach logarithms. With this in mind, the companion link:index.html[broad-audience article] endeavours to provide an intuitive introduction to applying centibels with no more prerequisites than elementary math.
+
 
 [[introduction]]
 == Introduction: quantifying reductions in centibels
@@ -30,7 +31,7 @@ When modeling the GHG emissions or energy consumption of some activity, we are u
 
 * a **_scaling factor_:** latexmath:[s_\times := \frac{q_1}{q_0}]
 ** Examples: ×1.25, ×0.25, ×0.5, ×1, ×0.1
-* a **_relative percentage_:** latexmath:[p_\% := 100 \cdot \frac{q_1}{q_0}]
+* a **_relative percentage_:** latexmath:[p_\% := 100 \cdot (\frac{q_1}{q_0} - 1)]
 ** Examples: +25%, -75%, -50%, +0%, -90%
 
 In this article, we introduce an alternative way of representing such a variation, lesser-known but arguably useful:
@@ -100,7 +101,7 @@ When latexmath:[q] varies from latexmath:[q_0] to latexmath:[q_1], it follows fr
 
 This is interesting, because it means that **expressed in centibels, the variations of individual factors add up to the total variation.** (Such is not the case with relative percentages, which is a common cause of error when applying percentages to multiplicative models.)
 
-This additive decomposition of compounded variations is valuable, because humans have a good intuition for quantities that add, but a poor intuition for quantities that multiply: additive quantities can be easily visualized by depicting them as lengths or displacements (this is the principle underlying most data visualization methods), and can be intuitively manipulated like ordinary extensive quantities (such as dollars, gallongs, kilograms, megabytes, etc.)
+This additive decomposition of compounded variations is valuable, because humans have a good intuition for quantities that add, but a poor intuition for quantities that multiply: additive quantities can be easily visualized by depicting them as lengths or displacements (this is the principle underlying most data visualization methods), and can be intuitively manipulated like ordinary extensive quantities (such as dollars, gallons, kilograms, megabytes, etc.)
 
 As an example, consider the following emissions model for cement production:
 
@@ -136,11 +137,12 @@ Notice how this problem, when expressed in centibels, turns into a "budget probl
 
 We see other potential benefits to centibels, detailed in the next sections:
 
-* when modeling emissions as power laws,
-* for exponential-decay emissions pathways,
-* as a proxy for reduction cost.
+* when modeling emissions as <<power-laws,power laws>>,
+* for <<exponential-decay-pathways, exponential-decay emissions pathways>>,
+* as a <<proxy-for-reduction-cost,proxy for reduction cost>>.
 
 
+[[power-laws]]
 == Power laws
 
 *_Power laws_* generalize over multiplicative models via decompositions of the form:
@@ -217,11 +219,15 @@ Therefore, the answer is _yes_, a reduction in ship speed compensated by an incr
 
 It has been https://www.ipcc.ch/site/assets/uploads/2018/05/SYR_AR5_FINAL_full_wcover.pdf[estimated by the IPCC] that remaining below +2°C of global warming corresponds to the constraint that future CO₂ emissions should not exceed a certain "carbon budget" (estimated to around 650 GtonCO₂ at the time of writing, but the exact number is irrelevant to our analysis). In this light, it makes sense for various actors to plan their future emissions such that they don't accumulate beyond a certain threshold: we call this the Carbon Budget Problem.
 
+[]
+====
 **The Carbon Budget Problem:** planning future emissions such that they don't exceed a certain threshold.
+====
 
 Note that we are not talking about _annual emissions_ here: the limit is measured in 650 GtonCO₂, not in 650 GtonCO₂/year. In particular, this implies that yearly emissions must asymptotically near zero.
 
 
+[[exponential-decay-pathways]]
 === Exponential-decay pathways
 
 
@@ -304,7 +310,10 @@ This invariant provides a very simply guideline for adjusting the "speed" of emi
 * If we started reducing 15 years before the Pivot Year, we would need to reduce at a pace of -2.89 cB/year
 * If we started reducing 5 years before the Pivot Year, we would need to reduce at a pace of -8.68 cB/year
 
+[]
+====
 **Intuitive interpretation:** there is a "reduction mileage" of -43.4 cB to be walked before the Pivot Year, from which the required speed of reduction can be inferred.
+====
 
 This is illustrated in the following chart:
 
@@ -328,9 +337,10 @@ image::exp-decay-global-pathways.svg[width=100%]
 
 in which latexmath:[C] is a constant determined by the shape of the pathway.
 
-For example, rather than constant centibel-speed pathways (for which latexmath:[C = 1/e]), we could imagine _constant centibel-acceleration_ pathways footnote:[these would be shaped as the half of a bell curve], for which latexmath:[C = e^{-\frac{\pi}{4}}].
+For example, rather than constant centibel-speed pathways (for which latexmath:[C = 1/e]), we could imagine _constant centibel-acceleration_ pathways (which are shaped as the decreasing half of a bell curve), for which latexmath:[C = e^{-\frac{\pi}{4}}].
 
 
+[[proxy-for-reduction-cost]]
 == Centibels as a proxy for reduction effort
 
 We now turn our attention to the problem of estimating the _effort_ or _cost_ of reducing GHG emissions. This is important in particular for planning emissions targets and the pathways to achieve them.
@@ -339,7 +349,7 @@ First, let us note that the amount of avoided emissions is not proportional to t
 
 Centibels naturally account for this "law of diminishing returns": in the above example, the first transition is a -12 cB variation, whereas the second is a -30 cB variation.
 
-We'll now provide theoritical support for how centibels can be a better proxy for reduction cost than avoided emissions.
+We'll now provide theoretical support for how centibels can be a better proxy for reduction cost than avoided emissions. More precisely, we'll show that under relatively weak assumptions on how GHG emissions decrease with the investment made for reducing them, predicting the required investment is always more accurate when extrapolating from the marginal cost-per-centibel-reduction than from the marginal cost-per-percent-reduction.
 
 We model emissions reductions by a function latexmath:[x \mapsto G(x)], in which:
 
@@ -362,9 +372,14 @@ This assumption can be formulated in the following equivalent ways:
 1. The function latexmath:[x \mapsto \log \frac{E(x)}{E(0)}] is concave.
 1. The function latexmath:[x \mapsto \log \frac{G(x)}{G(0)}] is convex. (This is sometimes phrased as latexmath:[G] being _log-convex._)
 
-Under this assumption, it can be proved that it is always **strictly more accurate to (locally footnote:[Why are we restricting our estimations to extrapolations from local behaviour? We assume that future costs are difficult to foresee, such that only local variations of latexmath:[G(x)] are known: this is why the approximation ratios are the derivatives at latexmath:[x=0] latexmath:[\left(\frac{d x}{d c_b}\right)_{x=0}] and latexmath:[\left(\frac{d x}{d p_{\%}}\right)_{x=0}]]) estimate the reduction cost by a constant effort-per-centibels ratio latexmath:[\left(\frac{d x}{d c_b}\right)_{x=0}] than by a constant effort-per-avoided-emissions ratio latexmath:[\left(\frac{d x}{d p_{\%}}\right)_{x=0}].** More precisely, the actual cost will be underestimated by both approximations, but less so by the centibel-based approximation. This is summarized by the following sketch:
+Under this assumption, it can be proved that it is always **strictly more accurate to (locally footnote:[Why are we restricting our estimations to extrapolations from local behaviour? We assume that future costs are difficult to foresee, such that only local variations of latexmath:[G(x)] are known: this is why the approximation ratios are the derivatives at latexmath:[x=0] latexmath:[\left(\frac{d x}{d c_b}\right)_{x=0}] and latexmath:[\left(\frac{d x}{d p_{\%}}\right)_{x=0}]]) estimate the reduction cost by a constant effort-per-centibels ratio latexmath:[\left(\frac{d x}{d c_b}\right)_{x=0}] than by a constant effort-per-avoided-emissions ratio latexmath:[\left(\frac{d x}{d p_{\%}}\right)_{x=0}].** More precisely, the actual cost will be underestimated by both approximations, but less so by the centibel-based approximation. This is illustrated by the following sketch:
 
 image::sketch-ghg-intensity-extrapolations.svg[width=100%]
+
+[NOTE]
+====
+The above conclusion formalizes the reason why <<exponential-decay-pathways,exponential-decay pathways>> are so popular: when the reduction effort is assumed to be proportional to the centibels variation, exponential-decay pathways are those that spread the effort evenly over the years.
+====
 
 The main objection we see to the realism of assumption A1 lies in threshold effects: in some situations, initial investments will not significantly reduce GHG emissions, until a critical when they go down a cliff, such that latexmath:[G(x)] has a stair-shaped curve. Arguably, this does not recommend for or against centibels as a proxy for cost: it rather means that long-term cost cannot be extrapolated from marginal costs in such situations.
 
@@ -485,6 +500,8 @@ For small variations (e.g between -5% and +5%), asciimath:[c_b] can be approxima
 
 
 For example, latexmath:[-2 \text{ cB} \approx -4.6\%].
+
+And reciprocally:
 
 [latexmath]
 ++++
