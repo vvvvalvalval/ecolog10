@@ -104,89 +104,10 @@
   *e)
 
 ;; ------------------------------------------------------------------------------
-;; Oz dummy example
-
-(defn play-data [& names]
-  (for [n names
-        i (range 20)]
-    {:time i :item n :quantity (+ (Math/pow (* i (count n)) 0.8) (rand-int (count n)))}))
-
-(def line-plot
-  {:data {:values (play-data "monkey" "slipper" "broom")}
-   :encoding {:x {:field "time" :type "quantitative"}
-              :y {:field "quantity" :type "quantitative"}
-              :color {:field "item" :type "nominal"}}
-   :mark "line"})
-
-
-(comment
-  (oz/view! line-plot)
-  *e)
-
-
-;; ------------------------------------------------------------------------------
-;; Vega Bar Chart example
-;; https://vega.github.io/vega/tutorials/bar-chart/
-
-(def bar-chart-example
-  {:axes [{:orient "bottom", :scale "xscale"} {:orient "left", :scale "yscale"}],
-   :width 400, :height 200,
-   :scales [{:name "xscale",
-             :type "band",
-             :domain {:data "table", :field "category"},
-             :range "width",
-             :padding 0.05,
-             :round true}
-            {:name "yscale",
-             :domain {:data "table", :field "amount"},
-             :nice true,
-             :range "height"}],
-   :padding 5,
-   :marks [{:type "rect",
-            :from {:data "table"},
-            :encode {:enter {:x {:scale "xscale", :field "category", :band 0.25},
-                             :width {:scale "xscale", :band 0.5},
-                             :y {:scale "yscale", :field "amount"},
-                             :y2 {:scale "yscale", :value 0}},
-                     :update {:fill {:value "steelblue"}},
-                     :hover {:fill {:value "red"}}}}
-           {:type "text",
-            :encode {:enter {:align {:value "center"},
-                             :baseline {:value "bottom"},
-                             :fill {:value "#333"}},
-                     :update
-                     {:x {:scale "xscale", :signal "tooltip.category", :band 0.5},
-                      :y {:scale "yscale", :signal "tooltip.amount", :offset -2},
-                      :text {:signal "tooltip.amount"},
-                      :fillOpacity [{:test "isNaN(tooltip.amount)", :value 0} {:value 1}]}}}],
-   :$schema "https://vega.github.io/schema/vega/v5.json",
-   :signals [{:name "tooltip",
-              :value {},
-              :on [{:events "rect:mouseover", :update "datum"} {:events "rect:mouseout", :update "{}"}]}],
-   :data [{:name "table",
-           :values [{:category "A", :amount 28}
-                    {:category "B", :amount 55}
-                    {:category "C", :amount 43}
-                    {:category "D", :amount 91}
-                    {:category "E", :amount 81}
-                    {:category "F", :amount 53}
-                    {:category "G", :amount 19}
-                    {:category "H", :amount 87}]}]})
-
-
-(comment
-
-  (oz/view! [:vega bar-chart-example])
-
-  *e)
-
-
-;; ------------------------------------------------------------------------------
 ;; Horizontal comparison scale
 
 
 (def comparison-scale-chart
-
   (let [cB-from -100.5
         cB-to 0.]
     {:$schema "https://vega.github.io/schema/vega/v5.json",
@@ -430,6 +351,7 @@
               :from {:data "target_reduction"},
               :encode {:enter {:text {:signal "'Target: ' + format(datum.rdact_cb, '.1f') + ' cB'"}
                                :x {:scale "xscale", :signal "datum.rdact_cb / 2"}
+                               ;; FIXME (put-text-above-bar ...)
                                :y {:scale "yscale", :field :rdact_factor, :band (+ bars-v-padding (/ bars-thickness 2))},
                                :width {:scale "xscale", :field :rdact_cb}
                                :height {:scale "yscale", :band bars-thickness}
@@ -1773,7 +1695,150 @@
                 :strokeDash {:value [4 1]}
                 :strokeWidth {:value 1}}}]})
 
-
 (comment
   (oz/view! proxy-cost-sketch)
   *e)
+
+
+
+;; ------------------------------------------------------------------------------
+;; Various plans for reducing beed consumption GHG emissions
+
+
+(def beef-reduction-plans
+  [{:plan_actions
+    [{:rdact_description "10X fewer meat meals"
+      :rdact_cb -100.
+      :rdact_factor "consumption"}]}
+   {:plan_actions
+    (let [cb0 (-> -60. (cB/rpct-to-scalar) (cB/scalar-to-cB))]
+      [{:rdact_description "Switch to low-carbon beef producers"
+        :rdact_cb cb0
+        :rdact_factor "intensity"}
+       {:rdact_description "4X fewer meat meals"
+        :rdact_cb (- -100. cb0)
+        :rdact_factor "consumption"}])}
+   {:plan_actions
+    (let [cb0 (-> -45. (cB/rpct-to-scalar) (cB/scalar-to-cB))]
+      [{:rdact_description "Replace half of beef by poultry/pork"
+        :rdact_cb cb0
+        :rdact_factor "intensity"}
+       {:rdact_description "5X fewer meat meals"
+        :rdact_cb (- -100. cb0)
+        :rdact_factor "consumption"}])}
+   {:plan_actions
+    [{:rdact_description "Replace all beef by poultry"
+      :rdact_cb -100.
+      :rdact_factor "intensity"}]}])
+
+
+(defn scale-set-discrete-color-scheme
+  [scale-obj colors]
+  (assoc scale-obj :range {:scheme colors}))
+
+
+(defn ax-hide-labels
+  [ax]
+  (update ax :encode assoc
+    :labels                                                 ;; https://github.com/vega/vega/issues/791#issuecomment-297766635
+    {:update
+     {:text {:value ""}}}))
+
+
+(defn ax-hide-ticks
+  [ax]
+  (update ax :encode assoc
+    :ticks
+    {:update
+     {:opacity {:value 0}}}))
+
+
+(def beef-ghg-reductions-plans
+  (let [bars-thickness 0.3
+        bars-v-padding (/ (- 1 bars-thickness) 2)]
+    {:title
+     {:text "4 diet plans to reduce GHG emissions from beef consumption."
+      :orient :bottom
+      :offset 15}
+     :$schema "https://vega.github.io/schema/vega/v5.json",
+     :width 850, :height 250,
+     :data [{:name "factor_reductions",
+             :values (->> beef-reduction-plans
+                       (into []
+                         (comp
+                           (map-indexed
+                             (fn [i plan]
+                               (->> (:plan_actions plan)
+                                 (add-cumulated-field
+                                   :rdact_previous_cb
+                                   :rdact_cb)
+                                 (mapv
+                                   (fn [rdact]
+                                     (assoc rdact
+                                       :plan_id i
+                                       :rdact_rpct (-> rdact :rdact_cb cB/cB-to-scalar cB/scalar-to-rpct)))))))
+                           cat)))}],
+     :axes [(-> {:orient "left",
+                 :scale "yscale"}
+              (ax-hide-labels)
+              (ax-hide-ticks))
+            {:orient "bottom",
+             :scale "xscale"
+             :title "Reduction (cB)"}],
+     :scales [{:name "yscale",
+               :type "band",
+               :domain {:data "factor_reductions", :field :plan_id},
+               :range "height",}
+              {:name "xscale",
+               :domain [-100. 0]
+               :range "width",
+               :reverse true
+               :round true}
+              (-> {:name "color"
+                   :type :ordinal
+                   :domain {:data "factor_reductions", :field :rdact_factor}}
+                (scale-set-discrete-color-scheme ["#55a868" "#4c72b0"]))],
+     :legends [{:title "Reduced factor"
+                :fill "color"}]
+     :padding 5,
+     :marks [{:name "reduction_action_bar"
+              :type "rect",
+              :from {:data "factor_reductions"},
+              :encode {:enter {:y {:scale "yscale", :field :plan_id, :band bars-v-padding},
+                               :height {:scale "yscale", :band bars-thickness}
+                               :width {:scale "xscale", :field :rdact_cb}
+                               :x {:scale "xscale", :field :rdact_previous_cb}
+                               :fill {:scale "color" :field :rdact_factor}},}}
+             {:name "reduction_action_bar_content"
+              :type "text",
+              :from {:data "factor_reductions"},
+              :encode {:enter {:text {:signal "format(datum.rdact_cb, '.1f') + ' cB'"}
+                               :x {:scale "xscale",
+                                   :signal "datum.rdact_previous_cb + (datum.rdact_cb / 2)"}
+                               :y {:scale "yscale", :field :plan_id, :band (+ bars-v-padding (/ bars-thickness 2))},
+                               :width {:scale "xscale", :field :rdact_cb}
+                               :height {:scale "yscale", :band bars-thickness}
+                               :align {:value "center"},
+                               :baseline {:value "middle"},
+                               :fill {:value "white"} :fontWeight {:value :normal}
+                               :fillOpacity {:value 1}},}}
+             {:name "reduction_action_bar_subtext"
+              :type "text",
+              :from {:data "factor_reductions"},
+              :encode {:enter {:align {:value "left"},
+                               :baseline {:value "bottom"},
+                               :fontStyle {:value :italic}
+                               :fill
+                               {:scale "color" :field :rdact_factor}},
+                       :update
+                       {:y {:scale "yscale",
+                            :field :plan_id,
+                            :band bars-v-padding ;; for centering
+                            :offset -2},
+                        :x {:scale "xscale",
+                            :signal "datum.rdact_previous_cb"
+                            :offset 2},
+                        :text {:signal "datum.rdact_description  + ' (' + format(datum.rdact_rpct, '.0f') + '%)'"},
+                        :fillOpacity {:value 1}}}}]}))
+
+(oz/view! [:vega beef-ghg-reductions-plans])

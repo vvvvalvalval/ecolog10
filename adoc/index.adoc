@@ -27,7 +27,7 @@ This website is still a work in progress. In particular, the following enhanceme
 
 [NOTE]
 ====
-There is a link:centibels-logarithmic-representations-for-the-carbon-transition.html[companion technical article] for persons with a scientific background.
+There is a link:centibels-logarithmic-representations-for-the-carbon-transition.html[companion technical article] for readers with a scientific background.
 ====
 
 
@@ -151,7 +151,25 @@ The following table gives you a conversion between centibels and more familiar r
 FIXME
 
 
-image::pct-vs-centibels-reductions.svg[width=100%]
+As an example, suppose that you're a regular meat eater, and want to reduce the GHG footprint of your diet. As is the case for many people, you realize that consuming beef accounts for most of that footprint, and so decide to reduce these beef-related GHG-emissions by a factor of 10 (therefore, a reduction of -90%, or equivalently -100 cB).
+
+To achieve this objective, you have a spectrum of strategies:
+
+. **sobriety approach:** eating meat 10 times less frequently;
+. **efficiency approach:** replacing beef with meat that is 10 times less carbon-intensive, such as poultry or pork;
+. a mix of the above 2 approaches.
+
+With that in mind, the following chart displays several diet plans for reducing beef-related GHG emissions:
+
+image::beef-diet-plans-bar-chart.svg[width=100%]
+
+Note that the above chart is only possible _because_ we are framing the problem in centibels.
+
+**_Efficiency or sobriety?_**
+
+What must we do to reduce the climate footprint of meat? Should we produce it differently, or should we just eat less of it?
+
+While environmental questions are often framed in such binary terms, the above figure shows us that there is in fact a continuum of possible responses, and gives us more precise answers than a vague _"well, we should to both"_.
 
 [TIP]
 ====
@@ -159,6 +177,9 @@ image::pct-vs-centibels-reductions.svg[width=100%]
 
 When emissions are decomposed into several factors, centibels measure emission reductions evenly across all factors.
 ====
+
+Another common problem is that impressive progress in carbon efficiency can drive us to forget how much of the work must still be done by sobriety. In our example, replacing half of beef by poultry feels significant, but attaining our objective still requires eating meat 5 times less frequently footnote:[granted, the issue is exacerbated by the fact that our objective is an ambitious reduction by 10; unfortunately, such ambitious objectives are often required for the carbon transition.]. By using centibels, the above figure makes this reality obvious.
+
 
 [TIP]
 ====
