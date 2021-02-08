@@ -7,7 +7,110 @@
             [oz.core :as oz])
   (:import (java.util GregorianCalendar)))
 
+;; ------------------------------------------------------------------------------
+;; Data utils
 
+(defn add-cumulated-field
+  [cum-field-name field ms]
+  (vec
+    (reductions
+      (fn [acc m]
+        (assoc m
+          cum-field-name
+          (+
+            (get acc cum-field-name)
+            (field acc))))
+      (assoc (first ms) cum-field-name 0)
+      (rest ms))))
+
+
+;; ------------------------------------------------------------------------------
+;; Vega Utils
+
+
+
+(defn ax_hide-labels
+  [ax]
+  (update ax :encode assoc
+    :labels                                                 ;; https://github.com/vega/vega/issues/791#issuecomment-297766635
+    {:update
+     {:text {:value ""}}}))
+
+
+(defn ax_hide-ticks
+  [ax]
+  (update ax :encode assoc
+    :ticks
+    {:update
+     {:opacity {:value 0}}}))
+
+
+
+
+(defn hbar_set-padding
+  "Narrows a horizontal bar mark around its vertical position, adding padding in the band above and below.
+
+  Given:
+  - rect-enc: a map that Vega-encodes the bar's vertical position (:y)
+  - padding: a number in [0, 0.5)
+  Returns the transformed rect-enc."
+  [{:as rect-enc, y :y} padding]
+  (let [bar-thickness (- 1. (* 2 padding))]
+    (-> rect-enc
+      (update :y assoc :band padding)
+      (update :height
+        (fn [h]
+          (merge
+            (select-keys y [:scale])
+            h
+            {:band bar-thickness}))))))
+
+
+(comment
+  (hbar_set-padding
+    {:y {:scale "yscale", :field :rdact_factor}
+     :width {:scale "xscale", :field :rdact_cb}
+     :x {:scale "xscale", :value 0}}
+    0.2)
+  => {:y {:scale "yscale", :field :rdact_factor, :band 0.2},
+      :width {:scale "xscale", :field :rdact_cb},
+      :x {:scale "xscale", :value 0},
+      :height {:scale "yscale", :band 0.6}}
+
+  *e)
+
+
+(defn scale_set-discrete-color-scheme
+  [scale-obj colors]
+  (assoc scale-obj :range {:scheme colors}))
+
+
+(defn text_center-in-hband
+  [{:as text-enc, y :y}]
+  (assoc text-enc
+    :y (assoc y :band 0.5)
+    :baseline {:value "middle"}))
+
+
+(defn text_put-below-hbar
+  [{:as text-enc, y :y} padding offset-px]
+  (merge text-enc
+    {:y (merge y
+          {:band (- 1. padding)
+           :offset offset-px})
+     :baseline {:value "top"}}))
+
+
+(defn text_put-above-hbar
+  [{:as text-enc, y :y} padding offset-px]
+  (merge text-enc
+    {:y (merge y
+          {:band padding
+           :offset offset-px})
+     :baseline {:value "bottom"}}))
+
+;; ------------------------------------------------------------------------------
+;; Misc
 
 (comment
 
@@ -212,9 +315,7 @@
                         :text {:field :txt}
                         :fillOpacity {:value 1}}}}]}))
 
-(comment
-  (oz/view! [:vega comparison-scale-chart])
-  *e)
+;(oz/view! [:vega comparison-scale-chart])
 
 
 ;; ------------------------------------------------------------------------------
@@ -249,20 +350,6 @@
          :rdact_factor "Usage"}))))
 
 
-(defn add-cumulated-field
-  [cum-field-name field ms]
-  (vec
-    (reductions
-      (fn [acc m]
-        (assoc m
-          cum-field-name
-          (+
-            (get acc cum-field-name)
-            (field acc))))
-      (assoc (first ms) cum-field-name 0)
-      (rest ms))))
-
-
 (def cement-reductions-chart
   (let [bars-thickness 0.3
         bars-v-padding (/ (- 1 bars-thickness) 2)
@@ -276,11 +363,10 @@
                 (-> r :rdact_cb cB-to-scalar scalar-to-rpct))))
           (add-cumulated-field :rdact_previous_cb :rdact_cb))]
     ;; colours from: http://seaborn.pydata.org/tutorial/color_palettes.html (Default Seaborn palette)
-    {:title
-     {:text "An allocation of reduction actions for cement production"
-      :orient :bottom
-      :offset 15}
-     :$schema "https://vega.github.io/schema/vega/v5.json",
+    {:$schema "https://vega.github.io/schema/vega/v5.json",
+     :title {:text "An allocation of reduction actions for cement production"
+             :orient :bottom
+             :offset 15}
      :width 500, :height 250,
      :data [{:name "factors"
              :values (concat
@@ -329,7 +415,7 @@
                :type "band",
                :domain {:data "factors", :field :rdact_factor_name},
                :range "height",
-               :nice true,}
+               :nice true}
               {:name "xscale",
                :domain [cement-target-cb 0]
                :range "width",
@@ -340,82 +426,76 @@
      :marks [{:name "target_bar"
               :type "rect",
               :from {:data "target_reduction"},
-              :encode {:enter {:y {:scale "yscale", :field :rdact_factor, :band bars-v-padding},
-                               :height {:scale "yscale", :band bars-thickness}
-                               :width {:scale "xscale", :field :rdact_cb}
-                               :x {:scale "xscale", :value 0}},
+              :encode {:enter
+                       (->
+                         {:x {:scale "xscale", :value 0}
+                          :width {:scale "xscale", :field :rdact_cb}
+                          :y {:scale "yscale", :field :rdact_factor}}
+                         (hbar_set-padding bars-v-padding))
                        :update {:fill {:value "#dd8462"}},
                        :hover {:fill {:value "#c44e52"}}}}
              {:name "target_bar_content"
               :type "text",
               :from {:data "target_reduction"},
-              :encode {:enter {:text {:signal "'Target: ' + format(datum.rdact_cb, '.1f') + ' cB'"}
-                               :x {:scale "xscale", :signal "datum.rdact_cb / 2"}
-                               ;; FIXME (put-text-above-bar ...)
-                               :y {:scale "yscale", :field :rdact_factor, :band (+ bars-v-padding (/ bars-thickness 2))},
-                               :width {:scale "xscale", :field :rdact_cb}
-                               :height {:scale "yscale", :band bars-thickness}
-                               :align {:value "center"},
-                               :baseline {:value "middle"},
-                               :fill {:value "white"} :fontWeight {:value :bold} :fontStyle {:value :italic}
-                               :fillOpacity {:value 1}}}}
+              :encode {:enter (-> {:text {:signal "'Target: ' + format(datum.rdact_cb, '.1f') + ' cB'"}
+                                   :fill {:value "white"} :fontWeight {:value :bold} :fontStyle {:value :italic}
+                                   :fillOpacity {:value 1}
+                                   :x {:scale "xscale", :signal "datum.rdact_cb / 2"}
+                                   :align {:value "center"}
+                                   :y {:scale "yscale", :field :rdact_factor}}
+                                (text_center-in-hband))}}
              {:name "target_bar_subtext"
               :type "text",
               :from {:data "target_reduction"},
-              :encode {:enter {:align {:value "right"},
-                               :baseline {:value "top"},
-                               :fontStyle {:value :italic}
-                               :fill {:value "#dd8462"}},
-                       :update
-                       {:y {:scale "yscale",
-                            :field :rdact_factor,
-                            :band (+ bars-v-padding bars-thickness)              ;; for centering
-                            :offset 2},
-                        :x {:scale "xscale",
-                            :field :rdact_cb
-                            :offset -2},
-                        :text {:signal "datum.rdact_description  + ' (' + format(datum.rdact_rpct, '.0f') + '%)'"},
-                        :fillOpacity {:value 1}}}}
+              :encode {:update
+                       (->
+                         {:align {:value "right"},
+                          :fontStyle {:value :italic}
+                          :fill {:value "#dd8462"}
+                          :y {:scale "yscale", :field :rdact_factor},
+                          :x {:scale "xscale",
+                              :field :rdact_cb
+                              :offset -2},
+                          :text {:signal "datum.rdact_description  + ' (' + format(datum.rdact_rpct, '.0f') + '%)'"},
+                          :fillOpacity {:value 1}}
+                         (text_put-below-hbar bars-v-padding 2))}}
 
              {:name "reduction_action_bar"
               :type "rect",
               :from {:data "factor_reductions"},
-              :encode {:enter {:y {:scale "yscale", :field :rdact_factor, :band bars-v-padding},
-                               :height {:scale "yscale", :band bars-thickness}
-                               :width {:scale "xscale", :field :rdact_cb}
-                               :x {:scale "xscale", :field :rdact_previous_cb}},
+              :encode {:enter (->
+                                {:y {:scale "yscale", :field :rdact_factor},
+                                 :width {:scale "xscale", :field :rdact_cb}
+                                 :x {:scale "xscale", :field :rdact_previous_cb}}
+                                (hbar_set-padding bars-v-padding))
                        :update {:fill {:signal "datum.rdact_colour || '#4c72b0'"}},
                        :hover {:fill {:value "#c44e52"}}}}
              {:name "reduction_action_bar_content"
               :type "text",
               :from {:data "factor_reductions"},
-              :encode {:enter {:text {:signal "format(datum.rdact_cb, '.1f') + ' cB'"}
-                               :x {:scale "xscale",
-                                   :signal "datum.rdact_previous_cb + (datum.rdact_cb / 2)"}
-                               :y {:scale "yscale", :field :rdact_factor, :band (+ bars-v-padding (/ bars-thickness 2))},
-                               :width {:scale "xscale", :field :rdact_cb}
-                               :height {:scale "yscale", :band bars-thickness}
-                               :align {:value "center"},
-                               :baseline {:value "middle"},
-                               :fill {:value "white"} :fontWeight {:value :normal #_:bold}
-                               :fillOpacity {:value 1}},}}
+              :encode {:enter (-> {:text {:signal "format(datum.rdact_cb, '.1f') + ' cB'"}
+                                   :x {:scale "xscale",
+                                       :signal "datum.rdact_previous_cb + (datum.rdact_cb / 2)"}
+                                   :align {:value :center}
+                                   :y {:scale "yscale", :field :rdact_factor},
+                                   :fill {:value "white"} :fontWeight {:value :normal #_:bold}
+                                   :fillOpacity {:value 1}}
+                                (text_center-in-hband))}},
              {:name "reduction_action_bar_subtext"
               :type "text",
               :from {:data "factor_reductions"},
-              :encode {:enter {:align {:value "right"},
-                               :baseline {:value "top"},
-                               :fontStyle {:value :italic}
-                               :fill {:signal "datum.rdact_colour || '#4c72b0'"}},
-                       :update
-                       {:y {:scale "yscale",
-                            :field :rdact_factor,
-                            :band (+ bars-v-padding bars-thickness)              ;; for centering
-                            :offset 2},
-                        :x {:scale "xscale",
-                            :signal "datum.rdact_previous_cb + datum.rdact_cb"
-                            :offset -2},
-                        :text {:signal "datum.rdact_description  + ' (' + format(datum.rdact_rpct, '.0f') + '%)'"},
-                        :fillOpacity {:value 1}}}}
+              :encode {:update
+                       (->
+                         {:align {:value "right"},
+                          :y {:scale "yscale", :field :rdact_factor},
+                          :x {:scale "xscale",
+                              :signal "datum.rdact_previous_cb + datum.rdact_cb"
+                              :offset -2},
+                          :text {:signal "datum.rdact_description  + ' (' + format(datum.rdact_rpct, '.0f') + '%)'"},
+                          :fontStyle {:value :italic}
+                          :fill {:signal "datum.rdact_colour || '#4c72b0'"}
+                          :fillOpacity {:value 1}}
+                         (text_put-below-hbar bars-v-padding 2))}}
 
              {:name "line_joining_bars"
               :type "rule"
@@ -431,11 +511,7 @@
                         :opacity {:value 0.5}}}}]}))
 
 
-(comment
-
-  (oz/view! [:vega cement-reductions-chart])
-
-  *e)
+;(oz/view! [:vega cement-reductions-chart])
 
 
 ;; ------------------------------------------------------------------------------
@@ -632,7 +708,7 @@
                   :encoding {:text
                              {:field :cB_reduction_speed_description}}}]}]}]}))
 
-(oz/view! exp-decay-single-chart)
+;(oz/view! exp-decay-single-chart)
 
 
 (def exp-decay-multi-chart
@@ -814,113 +890,11 @@
            :encoding {:x {:field :t, :type "temporal"}
                       :text {:field :my_rule_subtext}}}]}]}]}))
 
-(comment
-  (oz/view! exp-decay-multi-chart)
-  *e)
+;(oz/view! exp-decay-multi-chart)
 
 
 ;; ------------------------------------------------------------------------------
 ;; % vs cB chart
-
-
-(def pct-vs-cB-chart
-  {:$schema "https://vega.github.io/schema/vega-lite/v4.json",
-   :description "Various scenarios for constant centibel-speed (a.k.a 'exponential decay') emissions pathways",
-   :vconcat
-   [{:hconcat
-     [{:width 300
-       :data
-       {:values [{:descr "1 Initial"
-                  :y0 0.
-                  :y1 100.
-                  :col_num 1
-                  :color "red"}
-                 {:descr "2 "
-                  :rdact_description "Efficiency: -75% emission factor"
-                  :y0 25
-                  :y1 100.
-                  :col_num 2
-                  :color "blue"}
-                 {:descr "3 "
-                  :rdact_description "Sobriety: -60% usage"
-                  :y0 10
-                  :y1 25
-                  :col_num 3
-                  :color "green"}
-                 {:descr "4 Target"
-                  :y0 0
-                  :y1 10
-                  :col_num 4
-                  :color "grey"}]}
-       :encoding
-       {:y {:field :y0, :type :quantitative :title "GHG emissions"}
-        :y2 {:field :y1, :type :quantitative}
-        :x {:field :descr, :type :ordinal
-            :axis {:labelExpr "substring(datum.value, 2)"}
-            :title ""}
-        :color {:field :color :type :nominal :scale nil}}
-       :layer
-       [{:mark {:type :bar}}
-        {:mark {:type :text
-                :align :left
-                :baseline :middle
-                :dx 35}
-         :transform
-         [{:as :label_txt, :calculate "datum['rdact_description'] || ''"}
-          {:as :y3, :calculate "0.5 * (datum.y0 + datum.y1)"}]
-
-         :encoding
-         {:y {:field :y3, :type :quantitative}
-          :text
-          {:field :label_txt}}}]}
-      {:width 300
-       :data
-       {:values [{:descr "1 Initial"
-                  :y0 0.
-                  :y1 100.
-                  :col_num 1
-                  :color "red"}
-                 {:descr "2 "
-                  :rdact_description "Sobriety: -60% usage"
-                  :y0 40
-                  :y1 100
-                  :col_num 3
-                  :color "green"}
-                 {:descr "3 "
-                  :rdact_description "Efficiency: -75% emission factor"
-                  :y0 10
-                  :y1 40
-                  :col_num 2
-                  :color "blue"}
-                 {:descr "4 Target"
-                  :y0 0
-                  :y1 10
-                  :col_num 4
-                  :color "grey"}]}
-       :encoding
-       {:y {:field :y0, :type :quantitative :title "GHG emissions"}
-        :y2 {:field :y1, :type :quantitative}
-        :x {:field :descr, :type :ordinal
-            :axis {:labelExpr "substring(datum.value, 2)"}
-            :title ""}
-        :color {:field :color :type :nominal :scale nil}}
-       :layer
-       [{:mark {:type :bar}}
-        {:mark {:type :text
-                :align :left
-                :baseline :middle
-                :dx 35}
-         :transform
-         [{:as :label_txt, :calculate "datum['rdact_description'] || ''"}
-          {:as :y3, :calculate "0.5 * (datum.y0 + datum.y1)"}]
-
-         :encoding
-         {:y {:field :y3, :type :quantitative}
-          :text
-          {:field :label_txt}}}]}]}]})
-
-
-
 
 
 (def pct-vs-cB-chart
@@ -1097,14 +1071,9 @@
                              [{:y1 "Target"
                                :y2 (:rdact_factor_name (last reduction-actions1))
                                :x target-cB}]))}]
-         :axes [{:orient "left",
-                 :scale "yscale"
-                 :encode {:labels                           ;; https://github.com/vega/vega/issues/791#issuecomment-297766635
-                          {:update
-                           {:text {:value ""}}}
-                          :ticks
-                          {:update
-                           {:opacity {:value 0}}}}}
+         :axes [(-> {:orient "left", :scale "yscale"}
+                  (ax_hide-ticks)
+                  (ax_hide-labels))
                 {:orient "bottom",
                  :scale "xscale"
                  :title "GHG emissions reduction (cB)"}],
@@ -1116,7 +1085,6 @@
                   {:name "xscale",
                    :domain [target-cB 0]
                    :range {:signal "my_width"},
-                   ;:padding 0.05,
                    :reverse true
                    :round true}],
          :padding 5,
@@ -1126,57 +1094,55 @@
            [{:name "target_bar"
              :type "rect",
              :from {:data "target_reduction"}
-             :encode {:enter {:y {:scale "yscale", :value "Target", :band bars-v-padding},
-                              :height {:scale "yscale", :band bars-thickness}
-                              :x2 {:scale "xscale", :field :rdact_cb}
-                              :x {:scale "xscale", :value 0}}
+             :encode {:enter (->
+                               {:y {:scale "yscale", :value "Target"}
+                                :x2 {:scale "xscale", :field :rdact_cb}
+                                :x {:scale "xscale", :value 0}}
+                               (hbar_set-padding bars-v-padding))
                       :update {:fill {:value "#dd8462"}}}}
             {:name "target_bar_content"
              :type "text",
              :from {:data "target_reduction"},
-             :encode {:enter {:text {:signal "'Target: ' + format(datum.rdact_cb, '.1f') + ' cB'"}
-                              :x {:scale "xscale", :signal "datum.rdact_cb / 2"}
-                              :y {:scale "yscale", :field :rdact_factor, :band (+ bars-v-padding (/ bars-thickness 2))},
-                              :align {:value "center"},
-                              :baseline {:value "middle"},
-                              :fill {:value "white"} :fontWeight {:value :bold} :fontStyle {:value :italic}
-                              :fillOpacity {:value 1}}}}
+             :encode {:enter (-> {:text {:signal "'Target: ' + format(datum.rdact_cb, '.1f') + ' cB'"}
+                                  :x {:scale "xscale", :signal "datum.rdact_cb / 2"}
+                                  :y {:scale "yscale", :field :rdact_factor},
+                                  :align {:value "center"},
+                                  :fill {:value "white"} :fontWeight {:value :bold} :fontStyle {:value :italic}
+                                  :fillOpacity {:value 1}}
+                               (text_center-in-hband))}}
             {:name "reduction_action_bar"
              :type "rect",
              :from {:data "reduction_actions"},
-             :encode {:enter {:y {:scale "yscale", :field :rdact_factor_name, :band bars-v-padding},
-                              :height {:scale "yscale", :band bars-thickness}
-                              :x2 {:scale "xscale", :signal "datum.rdact_previous_cb + datum.rdact_cb"}
-                              :x {:scale "xscale", :field :rdact_previous_cb}},
+             :encode {:enter (-> {:y {:scale "yscale", :field :rdact_factor_name}
+                                  :x2 {:scale "xscale", :signal "datum.rdact_previous_cb + datum.rdact_cb"}
+                                  :x {:scale "xscale", :field :rdact_previous_cb}}
+                               (hbar_set-padding bars-v-padding))
                       :update {:fill {:field :rdact_colour}},}}
             {:name "reduction_action_bar_content"
              :type "text",
              :from {:data "reduction_actions"},
-             :encode {:enter {:text {:signal "format(datum.rdact_cb, '.1f') + ' cB'"}
-                              :x {:scale "xscale",
-                                  :signal "datum.rdact_previous_cb + (datum.rdact_cb / 2)"}
-                              :y {:scale "yscale", :field :rdact_factor_name, :band (+ bars-v-padding (/ bars-thickness 2))},
-                              :align {:value "center"},
-                              :baseline {:value "middle"},
-                              :fill {:value "white"}
-                              :fillOpacity {:value 1}},}}
+             :encode {:enter (-> {:text {:signal "format(datum.rdact_cb, '.1f') + ' cB'"}
+                                  :x {:scale "xscale",
+                                      :signal "datum.rdact_previous_cb + (datum.rdact_cb / 2)"}
+                                  :y {:scale "yscale", :field :rdact_factor_name},
+                                  :align {:value "center"},
+                                  :fill {:value "white"}
+                                  :fillOpacity {:value 1}}
+                               (text_center-in-hband))}}
             {:name "reduction_action_bar_subtext"
              :type "text",
              :from {:data "reduction_actions"},
-             :encode {:enter {:align {:value "right"},
-                              :baseline {:value "top"},
-                              :fontStyle {:value :italic}
-                              :fill {:field :rdact_colour}},
-                      :update
-                      {:y {:scale "yscale",
-                           :field :rdact_factor_name,
-                           :band (+ bars-v-padding bars-thickness) ;; for centering
-                           :offset 2},
-                       :x {:scale "xscale",
-                           :signal "datum.rdact_previous_cb + datum.rdact_cb"
-                           :offset -2},
-                       :text {:field :rdact_description},
-                       :fillOpacity {:value 1}}}}
+             :encode {:update
+                      (-> {:text {:field :rdact_description},
+                           :fontStyle {:value :italic}
+                           :fill {:field :rdact_colour},
+                           :fillOpacity {:value 1}
+                           :x {:scale "xscale",
+                               :signal "datum.rdact_previous_cb + datum.rdact_cb"
+                               :offset -2}
+                           :align {:value "right"}
+                           :y {:scale "yscale", :field :rdact_factor_name},}
+                        (text_put-below-hbar bars-v-padding 2))}}
             {:name "line_joining_bars"
              :type "rule"
              :from {:data "joining_lines"}
@@ -1191,9 +1157,7 @@
                        :opacity {:value 0.5}}}}])})]}))
 
 
-(comment
-  (oz/view! [:vega pct-vs-cB-chart])
-  *e)
+;(oz/view! [:vega pct-vs-cB-chart])
 
 
 
@@ -1574,12 +1538,12 @@
                      :hover {:fillOpacity {:value 0.5}}}}
            {:type :text
             :from {:data "rightmost_point"}
-            :encode {:enter {:align {:value "left"},
-                             :baseline {:value "middle"}},
-                     :update
-                     {:x {:scale "x", :field :x, :offset 3},
+            :encode {:update
+                     {:text {:value "No-growth baseline (-2.89 cB/year)"}
+                      :align {:value "left"},
+                      :baseline {:value "middle"}
+                      :x {:scale "x", :field :x, :offset 3},
                       :y {:scale "y", :field :ghgvar_no_growth},
-                      :text {:value "No-growth baseline (-2.89 cB/year)"},
                       :fill {:scale "color" :value 0}}}}
            {:type "area",
             :from {:data "table"},
@@ -1628,11 +1592,7 @@
                                 :hover {:fillOpacity {:value 0.5}}}}]}],})
 
 
-(comment
-
-  (oz/view! kaya-time-chart)
-
-  *e)
+;(oz/view! kaya-time-chart)
 
 
 
@@ -1695,9 +1655,7 @@
                 :strokeDash {:value [4 1]}
                 :strokeWidth {:value 1}}}]})
 
-(comment
-  (oz/view! proxy-cost-sketch)
-  *e)
+;(oz/view! proxy-cost-sketch)
 
 
 
@@ -1732,34 +1690,12 @@
       :rdact_factor "intensity"}]}])
 
 
-(defn scale-set-discrete-color-scheme
-  [scale-obj colors]
-  (assoc scale-obj :range {:scheme colors}))
-
-
-(defn ax-hide-labels
-  [ax]
-  (update ax :encode assoc
-    :labels                                                 ;; https://github.com/vega/vega/issues/791#issuecomment-297766635
-    {:update
-     {:text {:value ""}}}))
-
-
-(defn ax-hide-ticks
-  [ax]
-  (update ax :encode assoc
-    :ticks
-    {:update
-     {:opacity {:value 0}}}))
-
-
-(def beef-ghg-reductions-plans
+(def beef-ghg-reductions-plans-chart
   (let [bars-thickness 0.3
         bars-v-padding (/ (- 1 bars-thickness) 2)]
-    {:title
-     {:text "4 diet plans to reduce GHG emissions from beef consumption."
-      :orient :bottom
-      :offset 15}
+    {:title {:text "4 diet plans to reduce GHG emissions from beef consumption."
+             :orient :bottom
+             :offset 15}
      :$schema "https://vega.github.io/schema/vega/v5.json",
      :width 850, :height 250,
      :data [{:name "factor_reductions",
@@ -1780,15 +1716,15 @@
                            cat)))}],
      :axes [(-> {:orient "left",
                  :scale "yscale"}
-              (ax-hide-labels)
-              (ax-hide-ticks))
-            {:orient "bottom",
-             :scale "xscale"
-             :title "Reduction (cB)"}],
+              (ax_hide-labels)
+              (ax_hide-ticks))
+            {:title "Reduction (cB)"
+             :orient "bottom",
+             :scale "xscale"}],
      :scales [{:name "yscale",
                :type "band",
                :domain {:data "factor_reductions", :field :plan_id},
-               :range "height",}
+               :range "height"}
               {:name "xscale",
                :domain [-100. 0]
                :range "width",
@@ -1797,48 +1733,49 @@
               (-> {:name "color"
                    :type :ordinal
                    :domain {:data "factor_reductions", :field :rdact_factor}}
-                (scale-set-discrete-color-scheme ["#55a868" "#4c72b0"]))],
+                (scale_set-discrete-color-scheme ["#55a868" "#4c72b0"]))],
      :legends [{:title "Reduced factor"
                 :fill "color"}]
      :padding 5,
      :marks [{:name "reduction_action_bar"
               :type "rect",
               :from {:data "factor_reductions"},
-              :encode {:enter {:y {:scale "yscale", :field :plan_id, :band bars-v-padding},
-                               :height {:scale "yscale", :band bars-thickness}
-                               :width {:scale "xscale", :field :rdact_cb}
-                               :x {:scale "xscale", :field :rdact_previous_cb}
-                               :fill {:scale "color" :field :rdact_factor}},}}
+              :encode {:enter
+                       (-> {:y {:scale "yscale", :field :plan_id},
+                            :x {:scale "xscale", :field :rdact_previous_cb}
+                            :width {:scale "xscale", :field :rdact_cb}
+                            :fill {:scale "color" :field :rdact_factor}}
+                         (hbar_set-padding bars-v-padding))}}
              {:name "reduction_action_bar_content"
               :type "text",
               :from {:data "factor_reductions"},
-              :encode {:enter {:text {:signal "format(datum.rdact_cb, '.1f') + ' cB'"}
-                               :x {:scale "xscale",
-                                   :signal "datum.rdact_previous_cb + (datum.rdact_cb / 2)"}
-                               :y {:scale "yscale", :field :plan_id, :band (+ bars-v-padding (/ bars-thickness 2))},
-                               :width {:scale "xscale", :field :rdact_cb}
-                               :height {:scale "yscale", :band bars-thickness}
-                               :align {:value "center"},
-                               :baseline {:value "middle"},
-                               :fill {:value "white"} :fontWeight {:value :normal}
-                               :fillOpacity {:value 1}},}}
+              :encode {:enter
+                       (-> {:text {:signal "format(datum.rdact_cb, '.1f') + ' cB'"}
+                            :x {:scale "xscale",
+                                :signal "datum.rdact_previous_cb + (datum.rdact_cb / 2)"}
+                            :y {:scale "yscale", :field :plan_id},
+                            :width {:scale "xscale", :field :rdact_cb}
+                            :height {:scale "yscale"}
+                            :align {:value "center"},
+                            :fill {:value "white"} :fontWeight {:value :normal}
+                            :fillOpacity {:value 1}}
+                         (text_center-in-hband))}}
              {:name "reduction_action_bar_subtext"
               :type "text",
               :from {:data "factor_reductions"},
-              :encode {:enter {:align {:value "left"},
-                               :baseline {:value "bottom"},
-                               :fontStyle {:value :italic}
-                               :fill
-                               {:scale "color" :field :rdact_factor}},
-                       :update
-                       {:y {:scale "yscale",
-                            :field :plan_id,
-                            :band bars-v-padding ;; for centering
-                            :offset -2},
-                        :x {:scale "xscale",
-                            :signal "datum.rdact_previous_cb"
-                            :offset 2},
-                        :text {:signal "datum.rdact_description  + ' (' + format(datum.rdact_rpct, '.0f') + '%)'"},
-                        :fillOpacity {:value 1}}}}]}))
+              :encode {:update
+                       (->
+                         {:text {:signal "datum.rdact_description  + ' (' + format(datum.rdact_rpct, '.0f') + '%)'"}
+                          :fill {:scale "color" :field :rdact_factor}
+                          :fillOpacity {:value 1}
+                          :fontStyle {:value :italic}
+                          :x {:scale "xscale",
+                              :signal "datum.rdact_previous_cb"
+                              :offset 2}
+                          :align {:value "left"},
+                          :y {:scale "yscale",
+                              :field :plan_id}}
+                         (text_put-above-hbar bars-v-padding -2))}}]}))
 
-(oz/view! [:vega beef-ghg-reductions-plans])
+
+;(oz/view! [:vega beef-ghg-reductions-plans-chart])
