@@ -2204,8 +2204,17 @@
      "(Realistically, this may well be the main approach developers use for programming Vega graphics. "
      "Who makes a correct Vega chart from scratch?)"]]
    [:p
-    "Clojure's data diffing tools and code-awareness (via macros) are used to automatically "
-    "display what changed between the various steps of building the final chart."]])
+    "Clojure's data diffing tools and code-awareness (via macros) are used to  "
+    [:strong "automatically display what changed between the various steps of building the final chart. "]
+    "This might make the chart's code more accessible, as it's digested in small increments by the reader of the code. "
+    "It may also be useful for teaching Vega."]
+   [:p
+    "Another strength of Clojure in this case is its data-transformation capabilities, "
+    "which make the incremental edits to the Vega steps manageable."]
+   [:p
+    [:strong
+     "The rest of this document was generated automatically, "
+     "from the code that programs the incremental edits leading to the final chart."]]])
 
 (def sculpture
   [:div
