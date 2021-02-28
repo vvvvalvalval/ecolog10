@@ -4,8 +4,15 @@
             [clojure.java.io :as io]
             [clojure.pprint :as pp]
             [clojure.string :as str]
-            [oz.core :as oz])
-  (:import (java.util GregorianCalendar)))
+            [com.rpl.specter :as sp]
+            [lambdaisland.deep-diff2 :as ddiff]
+            [hickory.core]
+            [oz.core :as oz]
+            [vvvvalvalval.supdate.api :as supd]
+            [clojure.java.shell :as shell])
+  (:import (java.util GregorianCalendar)
+           (clojure.lang LineNumberingPushbackReader)
+           (java.nio.file Paths)))
 
 ;; ------------------------------------------------------------------------------
 ;; Data utils
@@ -1779,3 +1786,451 @@
 
 
 ;(oz/view! [:vega beef-ghg-reductions-plans-chart])
+
+
+;; ------------------------------------------------------------------------------
+;; Sculpting vega specs
+
+(defmacro show-metas
+  [& args]
+  (into [*file*]
+    (mapv meta args)))
+
+(def x
+  (show-metas
+
+    (+ 2
+      (* 3 12))
+    (fn [x]
+      (+ 3 4))))
+
+(comment
+
+
+
+
+  (meta #'sculpting-oz)
+
+
+  *e)
+
+(defn expr-string-at
+  [file line column]
+  (with-open [rdr (LineNumberingPushbackReader.
+                    (io/reader file))]
+    (dotimes [_ (dec line)]
+      (.readLine rdr))
+    (dotimes [_ (dec column)]
+      (.read rdr))
+    (str
+      (str/join (repeat (dec column) " "))
+      (second (read+string rdr)))
+    #_
+    (let [lf (.getLineNumber rdr)
+          cf (.getColumnNumber rdr)]
+      (with-open [rdr2 (io/reader file)]
+        (let [n-lines (+ 1 (- lf line))]
+          (->> (line-seq rdr2)
+            (drop (dec line))
+            (take n-lines)
+            (str/join "\n")))))))
+
+
+(comment
+  (println
+    (expr-string-at "/Users/val/projects/centibel-sobriety/centibel-sobriety/src/centibel_sobriety/core.clj"
+      1799 5))
+
+  *e)
+
+
+(defn resolve-git-sha []
+  (when-some [m (re-matches #"(.+)\n"
+                  (-> (shell/sh "git" "rev-parse" "HEAD")
+                    :out))]
+    (let [[_ git-commit-sha] m]
+      git-commit-sha)))
+
+
+(defn github-url
+  [[fpath lnum]]
+  (str
+    "https://github.com/vvvvalvalval/ecolog10/blob/"
+    (resolve-git-sha)
+    "/"
+    (let [[_ relpath] (re-matches #".*\/centibel\-sobriety\/(src\/.*)"
+                        fpath)]
+      relpath)
+    "#L" lnum))
+
+
+(comment
+  (.relativize
+    (str
+      (.toUri
+        (Paths/get "/Users/val/projects/centibel-sobriety/centibel-sobriety/src/centibel_sobriety/core.clj"
+          (into-array String []))))
+    (str
+      (.toUri
+        (.toAbsolutePath (Paths/get "." (into-array String []))))))
+  *e)
+
+
+
+(defn sculpting-oz
+  [{:as _opts
+    viz-type-kw ::viz-type
+    targets-reagent? ::targets-reagent?
+    :or {viz-type-kw :vega
+         targets-reagent? false}}
+   initial-chart transforms]
+  (into [:div]
+    (loop [ret [[:div
+                 [viz-type-kw initial-chart]]]
+           chart initial-chart
+           tfs transforms]
+      (if (empty? tfs)
+        ret
+        (let [{:as tf, transform-fn :data-carving.transorm/transform-fn} (first tfs)
+              next-chart (transform-fn chart)]
+          (recur
+            (conj ret
+              [:div {:style {:margin-top "5em"}}
+               (when-some [fn-name (:data-carving.transform/name tf)]
+                 [:span [:strong [:code fn-name " : "]]
+                  (when-some [[f l _c ns-sym] (:data-carving.transform/source-location tf)]
+                    [:code [:a {:href (github-url [f l])
+                                :target "_blank"}
+                            (str "(" ns-sym ":" l ")")]])])
+               (when-some [docstring (:data-carving.transform/docstring tf)]
+                 [:span [:blockquote docstring]])
+               (when-some [[f l c _ns-sym] (:data-carving.transform/source-location tf)]
+                 [:div
+                  [:pre [:code (expr-string-at f l c)]]])
+               [:pre
+                (let [data-diff-html
+                      (with-out-str
+                        (ddiff/pretty-print
+                          (let [[x1 x2] (clojure.data/diff chart next-chart)]
+                            (ddiff/diff x1 x2))
+                          (ddiff/printer {:color-markup :html-inline
+                                          :color-scheme
+                                          {:lambdaisland.deep-diff2.printer-impl/deletion [:bold :red]
+                                           :lambdaisland.deep-diff2.printer-impl/insertion [:bold :green]
+                                           ;; lambdaisland.deep-diff2.puget uses green and red for
+                                           ;; boolean/tag, but we want to reserve
+                                           ;; those for diffed values.
+
+                                           :delimiter nil
+                                           :tag nil
+
+                                           ;; primitive values
+                                           :nil nil
+                                           :boolean nil
+                                           :number nil
+                                           :string nil
+                                           :character nil
+                                           :keyword nil
+                                           :symbol nil
+                                           :lambdaisland.deep-diff2.printer-impl/other [:bold :black]}})))]
+                  (if targets-reagent?
+                    [:div {:dangerouslySetInnerHTML {:__html data-diff-html}}]
+                    (into [:div]
+                      (map hickory.core/as-hiccup)
+                      (hickory.core/parse-fragment data-diff-html))))]]
+              [:div
+               [viz-type-kw next-chart]])
+            next-chart
+            (next tfs)))))))
+
+
+(defn replace-deep
+  [m old->new]
+  (sp/transform
+    (sp/walker #(contains? old->new %))
+    (fn [x]
+      (get old->new x))
+    m))
+
+(defn having?
+  [k v]
+  (fn [x]
+    (and
+      (map? x)
+      (contains? x k)
+      (= v (get x k)))))
+
+
+(defn tfn-emit
+  [fn-name docstring [arg-sym] expr]
+  {:data-carving.transform/name `(quote ~fn-name)
+   :data-carving.transform/docstring docstring
+   :data-carving.transform/source-location
+   (let [{l :line c :column} (meta expr)]
+     (when (and *file* l c)
+       [*file* l c `(quote ~(ns-name *ns*))]))
+   :data-carving.transorm/transform-fn
+   `(fn [~arg-sym]
+      ~expr)})
+
+
+(defmacro tfn
+  "'Transform-FN' Expresses a chart transform in a syntax similar to a function. Returns a map."
+  ([arg-vec expr]
+   (tfn-emit nil nil arg-vec expr))
+  ([fn-name arg-vec expr]
+   (tfn-emit fn-name nil arg-vec expr))
+  ([fn-name docstring arg-vec expr]
+   (tfn-emit fn-name docstring arg-vec expr)))
+
+
+
+(def initial-vertical-bar-chart
+  {;; taken from: https://vega.github.io/vega/examples/bar-chart/
+   :$schema "https://vega.github.io/schema/vega/v5.json",
+   :description "A basic bar chart example, with value labels shown upon mouse hover.",
+
+   :data [{:name "table",
+           :values [{:category "A", :amount 28}
+                    {:category "B", :amount 55}
+                    {:category "C", :amount 43}
+                    {:category "D", :amount 91}
+                    {:category "E", :amount 81}
+                    {:category "F", :amount 53}
+                    {:category "G", :amount 19}
+                    {:category "H", :amount 87}]}],
+
+   :width 400, :height 200
+   :padding 5,
+   :scales [{:name "xscale",
+             :type "band",
+             :domain {:data "table", :field "category"},
+             :range "width",
+             :padding 0.05,
+             :round true}
+            {:name "yscale",
+             :domain {:data "table", :field "amount"},
+             :nice true,
+             :range "height"}]
+   :axes [{:orient "bottom",
+           :scale "xscale"}
+          {:orient "left",
+           :scale "yscale"}],
+
+   :signals [{:name "tooltip",
+              :value {},
+              :on [{:events "rect:mouseover", :update "datum"}
+                   {:events "rect:mouseout", :update "{}"}]}]
+   :marks [{:type "rect",
+            :from {:data "table"},
+            :encode {:enter {:x {:scale "xscale", :field "category"},
+                             :width {:scale "xscale", :band 1},
+                             :y {:scale "yscale", :field "amount"},
+                             :y2 {:scale "yscale", :value 0}},
+                     :update {:fill {:value "steelblue"}},
+                     :hover {:fill {:value "red"}}}}
+           {:type "text",
+            :encode {:enter {:align {:value "center"}, :baseline {:value "bottom"}, :fill {:value "#333"}},
+                     :update {:x {:scale "xscale", :signal "tooltip.category", :band 0.5},
+                              :y {:scale "yscale", :signal "tooltip.amount", :offset -2},
+                              :text {:signal "tooltip.amount"},
+                              :fillOpacity [{:test "datum === tooltip", :value 0} {:value 1}]}}}],})
+
+
+(def transforms-to-beef-plans
+  [(tfn make-more-minimalist
+     "Simplifies the initial Vega chart, removing the hovering behaviour."
+     [vega-spec]
+     (-> vega-spec
+       (dissoc :signals)
+       (update :marks #(-> % (butlast) (vec)))
+       (update-in [:marks 0 :encode] dissoc :hover)))
+   (tfn remove-padding
+     "Zeroes the :padding property, just to see what this does."
+     [vega-spec]
+     (-> vega-spec
+       (assoc :padding 0)
+       #_(update-in [:scales 0] dissoc :padding)))
+   (tfn make-horizontal-bar-chart [vega-spec]
+     (-> vega-spec
+       (update-in [:axes 0] assoc :orient "left")
+       (update-in [:axes 1] assoc :orient "bottom")
+       (update-in [:scales 0] assoc :range "height")
+       (update-in [:scales 1] assoc :range "width")
+       (replace-deep {"xscale" "yscale"
+                      "yscale" "xscale"})
+       (->>
+         (sp/transform [:marks sp/ALL :encode sp/MAP-VALS]
+           (fn [enc]
+             (replace-deep enc
+               {:x :y
+                :width :height
+                :y :x
+                :y2 :x2}))))))
+   (tfn add-real-data
+     "Gets rid of the fake example data, replacing it with the data we actually want to display."
+     [vega-spec]
+     (-> vega-spec
+       (assoc
+         :data
+         [{:name "factor_reductions",
+           :values (->> beef-reduction-plans
+                     (into []
+                       (comp
+                         (map-indexed
+                           (fn [i plan]
+                             (->> (:plan_actions plan)
+                               (add-cumulated-field
+                                 :rdact_previous_cb
+                                 :rdact_cb)
+                               (mapv
+                                 (fn [rdact]
+                                   (assoc rdact
+                                     :plan_id i
+                                     :rdact_rpct (-> rdact :rdact_cb cB/cB-to-scalar cB/scalar-to-rpct)))))))
+                         cat)))}])
+       (assoc
+         :legends
+         [{:title "Reduced factor"
+           :fill "color"}])
+       (update :scales conj
+         (-> {:name "color"
+              :type :ordinal
+              :domain {:data "factor_reductions", :field :rdact_factor}}
+           (scale_set-discrete-color-scheme ["#55a868" "#4c72b0"])))
+       (replace-deep {"table" "factor_reductions"
+                      "category" :plan_id
+                      "amount" :rdact_cb})
+       (->>
+         (sp/transform [:marks sp/ALL (having? :type "rect") :encode]
+           (fn [encode]
+             (-> encode
+               (supd/supdate
+                 {:update false
+                  :enter
+                  (fn [enc]
+                    (-> enc
+                      (dissoc :x2)
+                      (assoc
+                        :y {:scale "yscale", :field :plan_id}
+                        :x {:scale "xscale", :field :rdact_previous_cb}
+                        :width {:scale "xscale", :field :rdact_cb}
+                        :fill {:scale "color" :field :rdact_factor})))}))))
+         (sp/transform [:scales sp/ALL (having? :name "xscale")]
+           (fn [scale]
+             (merge scale
+               {:reverse true
+                :domain [-100. 0]}))))))
+   (tfn add-subtext-above-bars
+     "Thins out the bars and adds subtext on top of them, describing reduction actions."
+     [vega-spec]
+     (let [bars-thickness 0.3
+           bars-v-padding (/ (- 1 bars-thickness) 2)]
+       (-> vega-spec
+         (update-in [:marks 0 :encode :enter]
+           (fn [enc]
+             (-> enc
+               (hbar_set-padding bars-v-padding))))
+         (update :marks conj
+           {:name "reduction_action_bar_subtext"
+            :type "text",
+            :from {:data "factor_reductions"},
+            :encode {:update
+                     (->
+                       {:text {:signal "datum.rdact_description  + ' (' + format(datum.rdact_rpct, '.0f') + '%)'"}
+                        :fill {:scale "color" :field :rdact_factor}
+                        :fillOpacity {:value 1}
+                        :fontStyle {:value :italic}
+                        :x {:scale "xscale",
+                            :signal "datum.rdact_previous_cb"
+                            :offset 2}
+                        :align {:value "left"},
+                        :y {:scale "yscale",
+                            :field :plan_id}}
+                       (text_put-above-hbar bars-v-padding -2))}}))))
+   (tfn adjust-dimensions
+     "Widens the chart so that subtext can span without collision."
+     [vega-spec]
+     (assoc vega-spec :width 850, :height 250))
+   (tfn clear-y-axis [vega-spec]
+     (sp/transform [:axes sp/ALL (having? :scale "yscale")]
+       (fn [ax]
+         (-> ax
+           (ax_hide-labels)
+           (ax_hide-ticks)))
+       vega-spec))
+   (tfn add-titles [vega-spec]
+     (-> vega-spec
+       (assoc :title "4 diet plans to reduce GHG emissions from beef consumption.")
+       (->>
+         (sp/transform [:axes sp/ALL (having? :scale "xscale")]
+           (fn [ax]
+             (assoc ax :title "Reduction (cB)"))))))
+   (tfn adjust-title [vega-spec]
+     (update vega-spec :title
+       (fn [title-text]
+         {:text title-text
+          :orient :bottom
+          :offset 15})))
+   (tfn add-bars-content
+     "Adds text *inside* the bars, this time quantifying the reduction actions in centibels."
+     [vega-spec]
+     (-> vega-spec
+       (update :marks conj
+         {:name "reduction_action_bar_content"
+          :type "text",
+          :from {:data "factor_reductions"},
+          :encode {:enter
+                   (-> {:text {:signal "format(datum.rdact_cb, '.1f') + ' cB'"}
+                        :x {:scale "xscale",
+                            :signal "datum.rdact_previous_cb + (datum.rdact_cb / 2)"}
+                        :y {:scale "yscale", :field :plan_id},
+                        :width {:scale "xscale", :field :rdact_cb}
+                        :height {:scale "yscale"}
+                        :align {:value "center"},
+                        :fill {:value "white"} :fontWeight {:value :normal}
+                        :fillOpacity {:value 1}}
+                     (text_center-in-hband))}})))])
+
+(def <introduction>
+  [:div
+   [:p
+    "This code-generated Oz document demonstrates a kind of 'literate dataviz programming', "
+    "in which a sophisticated Vega chart is progressively made via various edits to a "
+    [:a {:href "https://vega.github.io/vega/examples/bar-chart/" :target "_blank"} "basic example chart"]
+    "."]
+   [:p
+    [:em
+     "(Realistically, this may well be the main approach developers use for programming Vega graphics. "
+     "Who makes a correct Vega chart from scratch?)"]]
+   [:p
+    "Clojure's data diffing tools and code-awareness (via macros) are used to automatically "
+    "display what changed between the various steps of building the final chart."]])
+
+(def sculpture
+  [:div
+   <introduction>
+   (sculpting-oz {::viz-type :vega, ::targets-reagent? true}
+     initial-vertical-bar-chart
+     transforms-to-beef-plans)])
+
+
+(oz/view! sculpture)
+
+(comment
+
+  (oz/export!
+    [:div
+     <introduction>
+     (sculpting-oz {::viz-type :vega, ::targets-reagent? false}
+       initial-vertical-bar-chart
+       transforms-to-beef-plans)]
+    "generated/sculpture-test-0.html")
+
+  (ddiff/pretty-print
+    (ddiff/diff {:a 1 :b 2} {:a 1 :b 3})
+    (ddiff/printer {:color-markup :html-inline}))
+
+  *e)
+
+
