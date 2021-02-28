@@ -1,5 +1,5 @@
-:author: Valentin Waeselynck
-:email: valentin.waeselynck@polytechnique.edu
+:author: Valentin Waeselynck, Pauline Vialatte
+:email: valentin.waeselynck@polytechnique.edu, pauline.vialatte@hec.edu
 :man-linkstyle: blue R <>
 :mansource: Asciidoctor
 :manversion: 1.0
@@ -18,7 +18,6 @@ ____
 ====
 This website is still a work in progress. In particular, the following enhancements are planned:
 
-1. Tutorial for computing _percentage <--> scale factor <--> centibels_ conversions.
 1. Interactive widget for the above.
 1. New section about caveats, limitations and workarounds
 1. French translation
@@ -31,106 +30,71 @@ There is a link:centibels-logarithmic-representations-for-the-carbon-transition.
 ====
 
 
-== Introduction ==
+== Introduction
 
 *The problem:* the environmental transition requires us to make plans with numbers - numbers such as 'GHG emissions must be reduced by 5% every year' or 'the emissions from sea shipping should be halved by 2050'.
 
 Currently, we're not very good as dealing with such numbers. This guide aims to provide everyone with intellectual tools that make this quantitative planning more straightforward in many situations, while requiring no more than elementary-school math.
 
-The main notion we introduce is the *centibel*. The _centibel_ is a unit of measure for how much some quantity gets scaled or downscaled. It turns out that if we frame our objectives and opportunities in terms of centibels (as opposed to percentages or physical units), many GHG reductions problems become easy to work out and visualize.
+The main notion we introduce is the *centibel*. The _centibel_ (abbreviated 'cB') is a unit of measure for how much some quantity gets scaled or downscaled. Here we will use centibels to quantify variations of GHG emissions and related quantities. It turns out that if we frame our objectives and opportunities in terms of centibels (as opposed to percentages or physical units), many GHG reductions problems become easy to work out and visualize.
+
+Centibels have a use similar to percentages: they describe relative variations. As you can say that some quantity varies by +25% or -50%, so you can say that it varies by +10cB or -30cB. Here are a few more examples:
+
+.Example variations expressed as multiplications, relative percentages, and centibels.
+[cols=3*, options="header"]
+|===
+|Variation
+|in %
+|in centibels
+
+
+|×10
+|+900%
+|+100.00 cB
+
+|×3
+|+200%
+|+47.7 cB
+
+|×1
+|+0%
+|+0 cB
+
+|×1.01
+|+1%
+|+0.432 cB
+
+|×0.99
+|-1%
+|-0.436 cB
+
+|× asciimath:[1/2]
+|-50%
+|-30.1 cB
+
+|× asciimath:[1/4]
+|-75%
+|-60.2 cB
+
+|× asciimath:[1/10]
+|-90%
+|-100 cB
+
+|× asciimath:[1/100]
+|-99%
+|-200 cB
+
+|===
+
+
+However, centibels don't work like percentages, because *multiplying variations maps to adding the corresponding centibels:* for example, dividing a quantity by 2 (-30 cB) then dividing the result by 3 (-48cB) is a (-30) + (-48) = -78 cB reduction. This property of turning multiplications into additions is what makes centibels useful, and percentages have no such property.
+
+
+We will show you how to concretly convert between percentages and centibels in <<converting-to-from-centibels, the Appendix>>. Meanwhile, the following scale provides a visual reference:
 
 image::rpct-centibels-conversion-ruler.svg[width=100%]
 
-The following table gives you a conversion between centibels and more familiar representations:
-
-[cols=3*, options="header"]
-|===
-|Percentage
-|Scale factor
-|Centibels
-
-
-|*+900%*
-|*×10*
-|*+100.00 cB*
-
-|+400%
-|×5
-|+69.90 cB
-
-|*+100%*
-|*×2*
-|*+30.10 cB*
-
-|*+50%*
-|*×1.50*
-|*+17.61 cB*
-
-|+33%
-|×1.33
-|+12.39 cB
-
-|+20%
-|×1.20
-|+7.92 cB
-
-|+10%
-|×1.10
-|+4.14 cB
-
-|+5%
-|×1.05
-|+2.12 cB
-
-|*+1%*
-|*×1.01*
-|*+0.43 cB*
-
-|*+0%*
-|*×1*
-|*+0.00 cB*
-
-|*-1%*
-|*×0.99*
-|*-0.44 cB*
-
-|-5%
-|×0.95
-|-2.23 cB
-
-|-10%
-|×0.90
-|-4.58 cB
-
-|-20%
-|×0.80
-|-9.69 cB
-
-|*-50%*
-|*× asciimath:[1/2]*
-|*-30.10 cB*
-
-|*-75%*
-|*×0.25*
-|*-60.21 cB*
-
-|-80%
-|×0.20
-|-69.90 cB
-
-|*-90%*
-|*×0.10*
-|*-100.00 cB*
-
-|*-95%*
-|*×0.05*
-|*-130.10 cB*
-
-|*-99%*
-|*×0.01*
-|*-200.00 cB*
-|===
-
+In addition, here are a few more useful reference points:
 
 [TIP]
 ====
@@ -145,13 +109,15 @@ The following table gives you a conversion between centibels and more familiar r
 
 ====
 
+A small amount of practice makes it much easier to convert between centibels and other representations; however, even that is not always needed. As we'll see, centibels can sometimes be used fruitfully without ever converting them to percentages or physical units, by expressing in the first place the inputs and outputs of the problem at hand in centibels, and letting intuition handle them as it would any other quantity.
 
-== Problem: compounded reductions are misrepresented ==
+
+== Problem: compounded reductions are misrepresented
 
 FIXME
 
 
-As an example, suppose that you're a regular meat eater, and want to reduce the GHG footprint of your diet. As is the case for many people, you realize that consuming beef accounts for most of that footprint, and so decide to reduce these beef-related GHG-emissions by a factor of 10 (therefore, a reduction of -90%, or equivalently -100 cB).
+As an example, suppose that you're a regular meat eater, and want to reduce the GHG footprint of your diet footnote:[For more on food-related GHG emissions, see https://ourworldindata.org/environmental-impacts-of-food#co2-and-greenhouse-gas-emissions]. As is the case for many people, you realize that consuming beef accounts for most of that footprint, and so decide to reduce these beef-related GHG-emissions by a factor of 10 (therefore, a reduction of -90%, or equivalently -100 cB).
 
 To achieve this objective, you have a spectrum of strategies:
 
@@ -169,7 +135,7 @@ Note that the above chart is only possible _because_ we are framing the problem 
 
 What must we do to reduce the climate footprint of meat? Should we produce it differently, or should we just eat less of it?
 
-While environmental questions are often framed in such binary terms, the above figure shows us that there is in fact a continuum of possible responses, and gives us more precise answers than a vague _"well, we should to both"_.
+While environmental questions are often framed in such binary terms, the above figure shows us that there is in fact a continuum of possible responses, and gives us more precise answers than a vague _"well, we should do both"_.
 
 [TIP]
 ====
@@ -194,11 +160,84 @@ In particular, using centibels tends to reveal the following challenge: _even hi
 
 === Diminishing returns
 
+Continuing with our meat emissions example, suppose that you decide to reduce your meat consumption from 10 meat meals per week to only 1. You do so gradually, reducing at each month by 1 meat meal/week:
+
+.An example diet schedule for reducing GHG emissions from meat consumption
+[cols=3*, options="header"]
+|===
+
+|Month
+|Meat meals per week
+|Reduction from initial consumption
+
+|January
+|10
+|-0%
+
+|February
+|9
+|-10%
+
+|March
+|8
+|-20%
+
+|...
+|...
+|...
+
+|September
+|2
+|-80%
+
+|October
+|1
+|-90%
+
+|November
+|1
+|-90%
+
+
+|===
+
+The September→October transition prevents exactly the same GHG emissions as the January→February transition: those of 1 meat meal per week, that is 10% of the initial emissions level.
+
+Yet there is a sense in which the September→October transition is much harder than the January→February transition, because the former is a much more drastic reduction in the frequency of meat meals:
+
+.Diminishing returns: reduction steps that have the same impact may have a different cost
+[cols=4*, options="header"]
+|===
+
+|Transition
+|from
+|to
+|gives up on
+
+|January → February
+|-0%
+|-10%
+|**1 in 10** meat meals
+
+|September → October
+|-80%
+|-90%
+|**1 in 2** meat meals
+
+
+|===
+
+In other words, in a -90% reduction trajectory, **eliminating the first 10% of emissions is usually much easier than eliminiting the last 10%.** This applies to a broad spectrum domains, especially when the reductions consist of improving the efficiency of some process. Centibels are effective at making obvious such differences in relative variations:
+
 .When reducing emissions, the first 10% of progress are usually much less expensive than the last. Centibels naturally account for this reality.
-image::cb-rcpt-jumps.png[width=100%]
+image::cb-rcpt-jumps.svg[width=100%]
 
 
-== Example: reducing emissions from cement ==
+== Application: decomposing the reduction effort across factors
+
+When GHG emission result from several compounded factors, using centibels makes it straightforward to reason about reducing them. This is illustrated in the following section by considering emissions from cement production.
+
+=== Example: reducing emissions from cement
 
 Assume that we want to reduce the CO₂ emissions from producing cement for construction : for example, we might aim to divide these emissions by 10 (-90%) on the long term, which corresponds exactly to a -100 cB target.
 
@@ -215,7 +254,7 @@ To be more explicit: in this model, CO₂ emissions are given by the following f
 
 [latexmath]
 ++++
-\text{CO₂ emissions} = \text{CO₂ intensity} \times \text{construction density} \times \text{usage}
+\text{CO₂ emissions} = \text{CO₂ intensity} \times \text{Construction density} \times \text{Usage}
 ++++
 
 When using centibels, the above equation turns in to the 'budget problem' of splitting the -100cB reduction across our 3 factors. The following chart provides an example:
@@ -235,7 +274,9 @@ This is not possible with percentages or tCO₂eq, because the reductions on ind
 
 
 
-== Example: emissions reduction pathway ==
+== Application: emissions reduction pathways
+
+The previous section discussed allocating emissions reduction efforts over several factors. This one discusses allocating them over _time_, that is planning **_emissions reduction pathways_**. Here again, framing the problem in centibels can make it more workable.
 
 []
 ====
@@ -334,7 +375,7 @@ FIXME
 ====
 
 
-== Example: the Kaya equation ==
+== Application: the Kaya equation ==
 
 The Kaya equation describes the GHG emissions of a society by decomposing them into the following 4 factors:
 
@@ -376,7 +417,12 @@ Can we do something about latexmath:[\frac{E}{\text{GDP}}], i.e make our economi
 People and governments tend to have strong feelings about demographic policies and economic growth; we will not debate here what objectives are acceptable regarding these factors, but it's important not to forget that they exist and can exert strong influence on GHG emissions, for better or for worse.
 
 
-== Example: saving fuel on cargo ships ==
+== Application: tackling more advanced emissions models
+
+Some situations demand more sophisticated emissions models than an elementary multiplication of factors, because some of the factors have to be raised to a certain power. These emissions models, known as _power laws_, are typically not discussed outside of technical circles, due to their relative mathematical sophistication. As we'll see, using centibels can make it easier to reason about such models.
+
+
+=== Example: saving fuel on cargo ships
 
 []
 ====
@@ -409,6 +455,26 @@ From these formulas, any engineer can give you the following elements:
 
 From here, you can deduce that _**by trading -1 cB in ship speed for +1 cB in fleet size, you keep the same transportation throughput, while reducing GHG emissions by +1 -3 = -2 cB.**_
 
+.How variations in ship speed and fleet size affect transportation throughput and GHG emissions.
+[cols=3*, options="header"]
+|===
+|Action
+|Impact on throughput
+|Impact on GHG emissions
+
+|-1 cB speed
+|-1 cB
+|-3 cB
+
+|+1 cB fleet size
+|+1 cB
+|+1 cB
+
+|**Both actions**
+|**+0 cB**
+|**-2 cB**
+|===
+
 So the answer is: _yes_, reducing ship speed does reduce GHG emissions in spite of the increase in fleet size (hurray!). Notice that by framing the situation in terms of centibels, we made this opportunity easy to spot and work out.
 
 For example, you can verify that a -10cB reduction in speed compensated by a +10cB increase in fleet size would translate to -20.6% in ship speed, +25.9% in fleet size, and -36.9% in GHG emissions from fuel consumption. In addition, compounding this approach with a _sobriety_ policy, we might not compensate all the way to +10cB in fleet size, in which case the GHG emissions would be even more reduced.
@@ -425,7 +491,8 @@ In some situations, the impact of reduction actions can become much easier to wo
 
 
 
-== Example: reducing emissions from driving cars ==
+////
+=== Example: reducing emissions from driving cars
 
 *Case study:* suppose we want to reduce the GHG emissions from driving individual cars.
 
@@ -449,8 +516,10 @@ When we frame the situation _**in centibels, these multiplications become additi
 [#cars-economy-centibels]
 .How various reduction actions might be combined to lowering car-driving emissions (numbers chosen arbitrarily).
 image::cars-economy-centibels.svg[]
+////
 
 
+[[converting-to-from-centibels]]
 == Appendix: converting to / from centibels
 
 Denoting latexmath:[p] the relative percentage (e.g -75%), latexmath:[s] the corresponding scaling factor (e.g latexmath:[\times \frac{1}{4}]), and latexmath:[c] the corresponding centibels (e.g -60.2 cB), we have the following *conversion formulas*:
