@@ -14,6 +14,7 @@ ____
 We need a plan that adds up!
 ____
 
+
 [WARNING]
 ====
 This website is still a work in progress. In particular, the following enhancements are planned:
@@ -24,10 +25,16 @@ This website is still a work in progress. In particular, the following enhanceme
 
 ====
 
+
+This article provides an exposition of techniques for considering reductions of GHG emissions, based on using _**centibels**_, a little-known method for quantifying change.
+
+These alternative techniques, illustrated here through various examples, **complement rather than replace** the more familiar ones. They provide another perspective on a range of emissions-reduction problems which makes them **more straightforward to reason about**, in particular by enabling **new types of visualizations**.
+
 [NOTE]
 ====
 There is a link:centibels-logarithmic-representations-for-the-carbon-transition.html[companion technical article] for readers with a scientific background.
 ====
+
 
 
 == Introduction
