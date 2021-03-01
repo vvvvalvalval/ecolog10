@@ -1,10 +1,12 @@
 (ns centibel-sobriety.core
   (:require [centibel-sobriety.math :as cB :refer :all]
+            [centibel-sobriety.utils.vega :as uvega]
             [clojure.data.csv :as csv]
             [clojure.java.io :as io]
             [clojure.pprint :as pp]
             [clojure.string :as str]
             [com.rpl.specter :as sp]
+            [data-carving.transform :as dc]
             [lambdaisland.deep-diff2 :as ddiff]
             [hickory.core]
             [oz.core :as oz]
@@ -1791,28 +1793,6 @@
 ;; ------------------------------------------------------------------------------
 ;; Sculpting vega specs
 
-(defmacro show-metas
-  [& args]
-  (into [*file*]
-    (mapv meta args)))
-
-(def x
-  (show-metas
-
-    (+ 2
-      (* 3 12))
-    (fn [x]
-      (+ 3 4))))
-
-(comment
-
-
-
-
-  (meta #'sculpting-oz)
-
-
-  *e)
 
 (defn expr-string-at
   [file line column]
@@ -1824,24 +1804,7 @@
       (.read rdr))
     (str
       (str/join (repeat (dec column) " "))
-      (second (read+string rdr)))
-    #_
-    (let [lf (.getLineNumber rdr)
-          cf (.getColumnNumber rdr)]
-      (with-open [rdr2 (io/reader file)]
-        (let [n-lines (+ 1 (- lf line))]
-          (->> (line-seq rdr2)
-            (drop (dec line))
-            (take n-lines)
-            (str/join "\n")))))))
-
-
-(comment
-  (println
-    (expr-string-at "/Users/val/projects/centibel-sobriety/centibel-sobriety/src/centibel_sobriety/core.clj"
-      1799 5))
-
-  *e)
+      (second (read+string rdr)))))
 
 
 (defn resolve-git-sha []
@@ -1864,18 +1827,6 @@
     "#L" lnum))
 
 
-(comment
-  (.relativize
-    (str
-      (.toUri
-        (Paths/get "/Users/val/projects/centibel-sobriety/centibel-sobriety/src/centibel_sobriety/core.clj"
-          (into-array String []))))
-    (str
-      (.toUri
-        (.toAbsolutePath (Paths/get "." (into-array String []))))))
-  *e)
-
-
 (defn html-inline-style
   [style-map]
   (str/join " "
@@ -1883,7 +1834,6 @@
       (fn [[k v]]
         (str (name k) ": " v ";"))
       style-map)))
-
 
 
 (defn sculpting-oz
@@ -2002,47 +1952,6 @@
             (next tfs)))))))
 
 
-(defn replace-deep
-  [m old->new]
-  (sp/transform
-    (sp/walker #(contains? old->new %))
-    (fn [x]
-      (get old->new x))
-    m))
-
-(defn having?
-  [k v]
-  (fn [x]
-    (and
-      (map? x)
-      (contains? x k)
-      (= v (get x k)))))
-
-
-(defn tfn-emit
-  [fn-name docstring [arg-sym] expr]
-  {:data-carving.transform/name `(quote ~fn-name)
-   :data-carving.transform/docstring docstring
-   :data-carving.transform/source-location
-   (let [{l :line c :column} (meta expr)]
-     (when (and *file* l c)
-       [*file* l c `(quote ~(ns-name *ns*))]))
-   :data-carving.transorm/transform-fn
-   `(fn [~arg-sym]
-      ~expr)})
-
-
-(defmacro tfn
-  "'Transform-FN' Expresses a chart transform in a syntax similar to a function. Returns a map."
-  ([arg-vec expr]
-   (tfn-emit nil nil arg-vec expr))
-  ([fn-name arg-vec expr]
-   (tfn-emit fn-name nil arg-vec expr))
-  ([fn-name docstring arg-vec expr]
-   (tfn-emit fn-name docstring arg-vec expr)))
-
-
-
 (def initial-vertical-bar-chart
   {;; taken from: https://vega.github.io/vega/examples/bar-chart/
    :$schema "https://vega.github.io/schema/vega/v5.json",
@@ -2096,36 +2005,32 @@
 
 
 (def transforms-to-beef-plans
-  [(tfn make-more-minimalist
+  [(dc/tfn make-more-minimalist
      "Simplifies the initial Vega chart, removing the hovering behaviour."
      [vega-spec]
      (-> vega-spec
        (dissoc :signals)
        (update :marks #(-> % (butlast) (vec)))
        (update-in [:marks 0 :encode] dissoc :hover)))
-   (tfn remove-padding
-     "Zeroes the :padding property, just to see what this does."
-     [vega-spec]
+   (dc/tfn make-horizontal-bar-chart [vega-spec]
      (-> vega-spec
-       (assoc :padding 0)
-       #_(update-in [:scales 0] dissoc :padding)))
-   (tfn make-horizontal-bar-chart [vega-spec]
-     (-> vega-spec
-       (update-in [:axes 0] assoc :orient "left")
-       (update-in [:axes 1] assoc :orient "bottom")
-       (update-in [:scales 0] assoc :range "height")
-       (update-in [:scales 1] assoc :range "width")
-       (replace-deep {"xscale" "yscale"
-                      "yscale" "xscale"})
+       (update :axes uvega/replace-deep
+         {"left" "bottom"
+          "bottom" "left"})
+       (update :scales uvega/replace-deep
+         {"height" "width"
+          "width" "height"})
+       (uvega/replace-deep {"xscale" "yscale"
+                            "yscale" "xscale"})
        (->>
          (sp/transform [:marks sp/ALL :encode sp/MAP-VALS]
            (fn [enc]
-             (replace-deep enc
+             (uvega/replace-deep enc
                {:x :y
                 :width :height
                 :y :x
                 :y2 :x2}))))))
-   (tfn add-real-data
+   (dc/tfn add-real-data
      "Gets rid of the fake example data, replacing it with the data we actually want to display."
      [vega-spec]
      (-> vega-spec
@@ -2150,45 +2055,48 @@
        (assoc
          :legends
          [{:title "Reduced factor"
-           :fill "color"}])
+           :fill "colorscale"}])
        (update :scales conj
-         (-> {:name "color"
+         (-> {:name "colorscale"
               :type :ordinal
               :domain {:data "factor_reductions", :field :rdact_factor}}
            (scale_set-discrete-color-scheme ["#55a868" "#4c72b0"])))
-       (replace-deep {"table" "factor_reductions"
-                      "category" :plan_id
-                      "amount" :rdact_cb})
-       (->>
-         (sp/transform [:marks sp/ALL (having? :type "rect") :encode]
-           (fn [encode]
-             (-> encode
-               (supd/supdate
-                 {:update false
-                  :enter
-                  (fn [enc]
-                    (-> enc
-                      (dissoc :x2)
-                      (assoc
-                        :y {:scale "yscale", :field :plan_id}
-                        :x {:scale "xscale", :field :rdact_previous_cb}
-                        :width {:scale "xscale", :field :rdact_cb}
-                        :fill {:scale "color" :field :rdact_factor})))}))))
-         (sp/transform [:scales sp/ALL (having? :name "xscale")]
-           (fn [scale]
-             (merge scale
-               {:reverse true
-                :domain [-100. 0]}))))))
-   (tfn add-subtext-above-bars
+       (uvega/replace-deep {"table" "factor_reductions"
+                            "category" :plan_id
+                            "amount" :rdact_cb})
+       (uvega/update-props :marks (uvega/having? {:type "rect"})
+         (fn [mark]
+           (-> mark
+             (assoc :name "reduction_action_bar")
+             (supd/supdate
+               {:encode
+                {:update false
+                 :enter (fn [enc]
+                          (-> enc
+                            (dissoc :x2)
+                            (assoc
+                              :y {:scale "yscale", :field :plan_id}
+                              :x {:scale "xscale", :field :rdact_previous_cb}
+                              :width {:scale "xscale", :field :rdact_cb}
+                              :fill {:scale "colorscale" :field :rdact_factor})))}}))))
+       (uvega/update-props :scales (uvega/having? {:name "xscale"})
+         (fn [scale]
+           (merge scale
+             {:reverse true
+              :domain [-100. 0]})))))
+   (dc/tfn add-subtext-above-bars
      "Thins out the bars and adds subtext on top of them, describing reduction actions."
      [vega-spec]
      (let [bars-thickness 0.3
            bars-v-padding (/ (- 1 bars-thickness) 2)]
        (-> vega-spec
-         (update-in [:marks 0 :encode :enter]
-           (fn [enc]
-             (-> enc
-               (hbar_set-padding bars-v-padding))))
+         (uvega/update-props :marks (uvega/having? {:name "reduction_action_bar"})
+           (fn [mark]
+             (supd/supdate mark
+               {:encode
+                {:enter (fn [enc]
+                          (-> enc
+                            (hbar_set-padding bars-v-padding)))}})))
          (update :marks conj
            {:name "reduction_action_bar_subtext"
             :type "text",
@@ -2196,7 +2104,7 @@
             :encode {:update
                      (->
                        {:text {:signal "datum.rdact_description  + ' (' + format(datum.rdact_rpct, '.0f') + '%)'"}
-                        :fill {:scale "color" :field :rdact_factor}
+                        :fill {:scale "colorscale" :field :rdact_factor}
                         :fillOpacity {:value 1}
                         :fontStyle {:value :italic}
                         :x {:scale "xscale",
@@ -2206,31 +2114,28 @@
                         :y {:scale "yscale",
                             :field :plan_id}}
                        (text_put-above-hbar bars-v-padding -2))}}))))
-   (tfn adjust-dimensions
+   (dc/tfn adjust-dimensions
      "Widens the chart so that subtext can span without collision."
      [vega-spec]
      (assoc vega-spec :width 850, :height 250))
-   (tfn clear-y-axis [vega-spec]
-     (sp/transform [:axes sp/ALL (having? :scale "yscale")]
+   (dc/tfn clear-y-axis [vega-spec]
+     (uvega/update-props vega-spec :axes (uvega/having? {:scale "yscale"})
        (fn [ax]
          (-> ax
            (ax_hide-labels)
-           (ax_hide-ticks)))
-       vega-spec))
-   (tfn add-titles [vega-spec]
+           (ax_hide-ticks)))))
+   (dc/tfn add-titles [vega-spec]
      (-> vega-spec
        (assoc :title "4 diet plans to reduce GHG emissions from beef consumption.")
-       (->>
-         (sp/transform [:axes sp/ALL (having? :scale "xscale")]
-           (fn [ax]
-             (assoc ax :title "Reduction (cB)"))))))
-   (tfn adjust-title [vega-spec]
+       (uvega/update-props :axes (uvega/having? {:scale "xscale"})
+         assoc :title "Reduction (cB)")))
+   (dc/tfn adjust-title [vega-spec]
      (update vega-spec :title
        (fn [title-text]
          {:text title-text
           :orient :bottom
           :offset 15})))
-   (tfn add-bars-content
+   (dc/tfn add-bars-content
      "Adds text *inside* the bars, this time quantifying the reduction actions in centibels."
      [vega-spec]
      (-> vega-spec
