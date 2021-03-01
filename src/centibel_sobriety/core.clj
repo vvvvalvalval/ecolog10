@@ -1876,6 +1876,15 @@
   *e)
 
 
+(defn html-inline-style
+  [style-map]
+  (str/join " "
+    (map
+      (fn [[k v]]
+        (str (name k) ": " v ";"))
+      style-map)))
+
+
 
 (defn sculpting-oz
   [{:as _opts
@@ -1885,8 +1894,40 @@
          targets-reagent? false}}
    initial-chart transforms]
   (into [:div]
-    (loop [ret [[:div
-                 [viz-type-kw initial-chart]]]
+    (loop [ret [[:h2 "The big picture"]
+                [:div
+                 [:div {:style (cond-> {:display "inline-block"}
+                                 (not targets-reagent?)
+                                 (html-inline-style))}
+                  [:div [:strong [:em "Starting point:"]]]
+                  [:div {:style (cond-> {:border "1px dotted lightgray"}
+                                  (not targets-reagent?)
+                                  (html-inline-style))}
+                   [viz-type-kw initial-chart]]]
+                 [:div {:style (cond-> {:display "inline-block"}
+                                 (not targets-reagent?)
+                                 (html-inline-style))}
+                  [:div [:strong [:em "End result:"]]]
+                  [:div {:style (cond-> {:border "1px dotted lightgray"}
+                                  (not targets-reagent?)
+                                  (html-inline-style))}
+                   [viz-type-kw
+                    (reduce
+                      (fn [chrt {:as _tf, transform-fn :data-carving.transorm/transform-fn}]
+                        (transform-fn chrt))
+                      initial-chart
+                      transforms)]]]]
+                [:hr]
+                [:h2 "Detailed steps"]
+                [:div
+                 [:div {:style (cond-> {:display "inline-block"}
+                                 (not targets-reagent?)
+                                 (html-inline-style))}
+                  [:div [:strong [:em "Starting point:"]]]
+                  [:div {:style (cond-> {:border "1px dotted lightgray"}
+                                  (not targets-reagent?)
+                                  (html-inline-style))}
+                   [viz-type-kw initial-chart]]]]]
            chart initial-chart
            tfs transforms]
       (if (empty? tfs)
@@ -1895,7 +1936,9 @@
               next-chart (transform-fn chart)]
           (recur
             (conj ret
-              [:div {:style {:margin-top "5em"}}
+              [:div {:style (cond-> {:margin-top "5em"}
+                              (not targets-reagent?)
+                              (html-inline-style))}
                (when-some [fn-name (:data-carving.transform/name tf)]
                  [:span [:strong [:code fn-name " : "]]
                   (when-some [[f l _c ns-sym] (:data-carving.transform/source-location tf)]
@@ -1939,7 +1982,22 @@
                       (map hickory.core/as-hiccup)
                       (hickory.core/parse-fragment data-diff-html))))]]
               [:div
-               [viz-type-kw next-chart]])
+               [:div {:style (cond-> {:display "inline-block"}
+                               (not targets-reagent?)
+                               (html-inline-style))}
+                [:div [:strong [:em "Before:"]]]
+                [:div {:style (cond-> {:border "1px dotted lightgray"}
+                                (not targets-reagent?)
+                                (html-inline-style))}
+                 [viz-type-kw chart]]]
+               [:div {:style (cond-> {:display "inline-block"}
+                               (not targets-reagent?)
+                               (html-inline-style))}
+                [:div [:strong [:em "After:"]]]
+                [:div {:style (cond-> {:border "1px dotted lightgray"}
+                                (not targets-reagent?)
+                                (html-inline-style))}
+                 [viz-type-kw next-chart]]]])
             next-chart
             (next tfs)))))))
 
