@@ -22,3 +22,12 @@
    (tfn-emit fn-name nil arg-vec expr))
   ([fn-name docstring arg-vec expr]
    (tfn-emit fn-name docstring arg-vec expr)))
+
+
+(defn end-result
+  [initial-chart transforms]
+  (reduce
+    (fn [chrt {:as _tf, transform-fn :data-carving.transorm/transform-fn}]
+      (transform-fn chrt))
+    initial-chart
+    transforms))

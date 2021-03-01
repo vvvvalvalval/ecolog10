@@ -1861,12 +1861,7 @@
                   [:div {:style (cond-> {:border "1px dotted lightgray"}
                                   (not targets-reagent?)
                                   (html-inline-style))}
-                   [viz-type-kw
-                    (reduce
-                      (fn [chrt {:as _tf, transform-fn :data-carving.transorm/transform-fn}]
-                        (transform-fn chrt))
-                      initial-chart
-                      transforms)]]]]
+                   [viz-type-kw (dc/end-result initial-chart transforms)]]]]
                 [:hr]
                 [:h2 "Detailed steps"]
                 [:div
