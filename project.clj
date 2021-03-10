@@ -4,9 +4,13 @@
   :license {:name "The MIT License"
             :url "https://github.com/asciidoctor/asciidoctor-lein-plugin/blob/master/LICENSE.adoc"}
 
-  :dependencies [[org.clojure/clojure "1.10.1"]
+  :dependencies [[lambdaisland/deep-diff2 "2.0.108"]
+                 [hickory "0.7.1"]
+                 [org.clojure/clojure "1.10.1"]
                  [org.clojure/data.csv "1.0.0"]
                  [ring/ring-core "1.8.1"] ;; for Oz deps problem: https://github.com/metasoarous/oz/issues/125
+                 [vvvvalvalval/supdate "0.2.3"]
+                 [com.rpl/specter "1.1.3"]
                  [metasoarous/oz "1.6.0-alpha26"]]
 
   ; List of plugins
