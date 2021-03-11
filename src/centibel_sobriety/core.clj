@@ -1668,126 +1668,7 @@
 
 
 
-;; ------------------------------------------------------------------------------
-;; Various plans for reducing beed consumption GHG emissions
 
-
-(def beef-reduction-plans
-  [{:plan_actions
-    [{:rdact_description "10X fewer meat meals"
-      :rdact_cb -100.
-      :rdact_factor "consumption"}]}
-   {:plan_actions
-    (let [cb0 (-> -60. (cB/rpct-to-scalar) (cB/scalar-to-cB))]
-      [{:rdact_description "Switch to low-carbon beef producers"
-        :rdact_cb cb0
-        :rdact_factor "intensity"}
-       {:rdact_description "4X fewer meat meals"
-        :rdact_cb (- -100. cb0)
-        :rdact_factor "consumption"}])}
-   {:plan_actions
-    (let [cb0 (-> -45. (cB/rpct-to-scalar) (cB/scalar-to-cB))]
-      [{:rdact_description "Replace half of beef by poultry/pork"
-        :rdact_cb cb0
-        :rdact_factor "intensity"}
-       {:rdact_description "5X fewer meat meals"
-        :rdact_cb (- -100. cb0)
-        :rdact_factor "consumption"}])}
-   {:plan_actions
-    [{:rdact_description "Replace all beef by poultry"
-      :rdact_cb -100.
-      :rdact_factor "intensity"}]}])
-
-
-(def beef-ghg-reductions-plans-chart
-  (let [bars-thickness 0.3
-        bars-v-padding (/ (- 1 bars-thickness) 2)]
-    {:title {:text "4 diet plans to reduce GHG emissions from beef consumption."
-             :orient :bottom
-             :offset 15}
-     :$schema "https://vega.github.io/schema/vega/v5.json",
-     :width 850, :height 250,
-     :data [{:name "factor_reductions",
-             :values (->> beef-reduction-plans
-                       (into []
-                         (comp
-                           (map-indexed
-                             (fn [i plan]
-                               (->> (:plan_actions plan)
-                                 (add-cumulated-field
-                                   :rdact_previous_cb
-                                   :rdact_cb)
-                                 (mapv
-                                   (fn [rdact]
-                                     (assoc rdact
-                                       :plan_id i
-                                       :rdact_rpct (-> rdact :rdact_cb cB/cB-to-scalar cB/scalar-to-rpct)))))))
-                           cat)))}],
-     :axes [(-> {:orient "left",
-                 :scale "yscale"}
-              (ax_hide-labels)
-              (ax_hide-ticks))
-            {:title "Reduction (cB)"
-             :orient "bottom",
-             :scale "xscale"}],
-     :scales [{:name "yscale",
-               :type "band",
-               :domain {:data "factor_reductions", :field :plan_id},
-               :range "height"}
-              {:name "xscale",
-               :domain [-100. 0]
-               :range "width",
-               :reverse true
-               :round true}
-              (-> {:name "color"
-                   :type :ordinal
-                   :domain {:data "factor_reductions", :field :rdact_factor}}
-                (scale_set-discrete-color-scheme ["#55a868" "#4c72b0"]))],
-     :legends [{:title "Reduced factor"
-                :fill "color"}]
-     :padding 5,
-     :marks [{:name "reduction_action_bar"
-              :type "rect",
-              :from {:data "factor_reductions"},
-              :encode {:enter
-                       (-> {:y {:scale "yscale", :field :plan_id},
-                            :x {:scale "xscale", :field :rdact_previous_cb}
-                            :width {:scale "xscale", :field :rdact_cb}
-                            :fill {:scale "color" :field :rdact_factor}}
-                         (hbar_set-padding bars-v-padding))}}
-             {:name "reduction_action_bar_content"
-              :type "text",
-              :from {:data "factor_reductions"},
-              :encode {:enter
-                       (-> {:text {:signal "format(datum.rdact_cb, '.1f') + ' cB'"}
-                            :x {:scale "xscale",
-                                :signal "datum.rdact_previous_cb + (datum.rdact_cb / 2)"}
-                            :y {:scale "yscale", :field :plan_id},
-                            :width {:scale "xscale", :field :rdact_cb}
-                            :height {:scale "yscale"}
-                            :align {:value "center"},
-                            :fill {:value "white"} :fontWeight {:value :normal}
-                            :fillOpacity {:value 1}}
-                         (text_center-in-hband))}}
-             {:name "reduction_action_bar_subtext"
-              :type "text",
-              :from {:data "factor_reductions"},
-              :encode {:update
-                       (->
-                         {:text {:signal "datum.rdact_description  + ' (' + format(datum.rdact_rpct, '.0f') + '%)'"}
-                          :fill {:scale "color" :field :rdact_factor}
-                          :fillOpacity {:value 1}
-                          :fontStyle {:value :italic}
-                          :x {:scale "xscale",
-                              :signal "datum.rdact_previous_cb"
-                              :offset 2}
-                          :align {:value "left"},
-                          :y {:scale "yscale",
-                              :field :plan_id}}
-                         (text_put-above-hbar bars-v-padding -2))}}]}))
-
-
-;(oz/view! [:vega beef-ghg-reductions-plans-chart])
 
 
 ;; ------------------------------------------------------------------------------
@@ -1947,6 +1828,43 @@
             (next tfs)))))))
 
 
+(def <introduction>
+  [:div
+   [:p
+    "This code-generated Oz document demonstrates a kind of 'literate dataviz programming', "
+    "in which a sophisticated Vega chart is progressively made via various edits to a "
+    [:a {:href "https://vega.github.io/vega/examples/bar-chart/" :target "_blank"} "basic example chart"]
+    "."]
+   [:p
+    [:em
+     "(Realistically, this may well be the main approach developers use for programming Vega graphics. "
+     "Who makes a correct Vega chart from scratch?)"]]
+   [:p
+    "Clojure's data diffing tools and code-awareness (via macros) are used to  "
+    [:strong "automatically display what changed between the various steps of building the final chart. "]
+    "This might make the chart's code more accessible, as it's digested in small increments by the reader of the code. "
+    "It may also be useful for teaching Vega."]
+   [:p
+    "Another strength of Clojure in this case is its data-transformation capabilities, "
+    "which make the incremental edits to the Vega steps manageable."]
+   [:p
+    [:strong
+     "The rest of this document was generated automatically, "
+     "from the code that programs the incremental edits leading to the final chart."]]])
+
+(defn sculpture-oz-page
+  [opts initial-chart transforms]
+  [:div
+   <introduction>
+   (sculpting-oz opts
+     initial-chart
+     transforms)])
+
+
+;; ------------------------------------------------------------------------------
+;; Bar charts for reduction plans
+
+
 (def initial-vertical-bar-chart
   {;; taken from: https://vega.github.io/vega/examples/bar-chart/
    :$schema "https://vega.github.io/schema/vega/v5.json",
@@ -1999,7 +1917,8 @@
                               :fillOpacity [{:test "datum === tooltip", :value 0} {:value 1}]}}}],})
 
 
-(def transforms-to-beef-plans
+(defn reduction-plans-bar-chart-transforms
+  [reduction-plans title-text]
   [(dc/tfn make-more-minimalist
      "Simplifies the initial Vega chart, removing the hovering behaviour."
      [vega-spec]
@@ -2032,7 +1951,7 @@
        (assoc
          :data
          [{:name "factor_reductions",
-           :values (->> beef-reduction-plans
+           :values (->> reduction-plans
                      (into []
                        (comp
                          (map-indexed
@@ -2045,6 +1964,7 @@
                                  (fn [rdact]
                                    (assoc rdact
                                      :plan_id i
+                                     :rdact_next_cb (+ (:rdact_previous_cb rdact) (:rdact_cb rdact))
                                      :rdact_rpct (-> rdact :rdact_cb cB/cB-to-scalar cB/scalar-to-rpct)))))))
                          cat)))}])
        (assoc
@@ -2054,7 +1974,7 @@
        (update :scales conj
          (-> {:name "colorscale"
               :type :ordinal
-              :domain {:data "factor_reductions", :field :rdact_factor}}
+                :domain ["consumption" "intensity"]}
            (scale_set-discrete-color-scheme ["#55a868" "#4c72b0"])))
        (uvega/replace-deep {"table" "factor_reductions"
                             "category" :plan_id
@@ -2072,13 +1992,14 @@
                             (assoc
                               :y {:scale "yscale", :field :plan_id}
                               :x {:scale "xscale", :field :rdact_previous_cb}
-                              :width {:scale "xscale", :field :rdact_cb}
+                              :x2 {:scale "xscale", :field :rdact_next_cb}
                               :fill {:scale "colorscale" :field :rdact_factor})))}}))))
        (uvega/update-props :scales (uvega/having? {:name "xscale"})
          (fn [scale]
            (merge scale
              {:reverse true
-              :domain [-100. 0]})))))
+              :domain {:fields [{:data "factor_reductions", :field :rdact_next_cb}
+                                {:data "factor_reductions", :field :rdact_previous_cb}]}})))))
    (dc/tfn add-subtext-above-bars
      "Thins out the bars and adds subtext on top of them, describing reduction actions."
      [vega-spec]
@@ -2112,7 +2033,9 @@
    (dc/tfn adjust-dimensions
      "Widens the chart so that subtext can span without collision."
      [vega-spec]
-     (assoc vega-spec :width 850, :height 250))
+     (assoc vega-spec
+       :height (* 60 (count reduction-plans))
+       :width 850))
    (dc/tfn clear-y-axis [vega-spec]
      (uvega/update-props vega-spec :axes (uvega/having? {:scale "yscale"})
        (fn [ax]
@@ -2121,15 +2044,16 @@
            (ax_hide-ticks)))))
    (dc/tfn add-titles [vega-spec]
      (-> vega-spec
-       (assoc :title "4 diet plans to reduce GHG emissions from beef consumption.")
+       (assoc :title title-text)
        (uvega/update-props :axes (uvega/having? {:scale "xscale"})
          assoc :title "Reduction (cB)")))
    (dc/tfn adjust-title [vega-spec]
      (update vega-spec :title
        (fn [title-text]
-         {:text title-text
-          :orient :bottom
-          :offset 15})))
+         (when (some? title-text)
+           {:text title-text
+            :orient :bottom
+            :offset 15}))))
    (dc/tfn add-bars-content
      "Adds text *inside* the bars, this time quantifying the reduction actions in centibels."
      [vega-spec]
@@ -2150,48 +2074,103 @@
                         :fillOpacity {:value 1}}
                      (text_center-in-hband))}})))])
 
-(def <introduction>
-  [:div
-   [:p
-    "This code-generated Oz document demonstrates a kind of 'literate dataviz programming', "
-    "in which a sophisticated Vega chart is progressively made via various edits to a "
-    [:a {:href "https://vega.github.io/vega/examples/bar-chart/" :target "_blank"} "basic example chart"]
-    "."]
-   [:p
-    [:em
-     "(Realistically, this may well be the main approach developers use for programming Vega graphics. "
-     "Who makes a correct Vega chart from scratch?)"]]
-   [:p
-    "Clojure's data diffing tools and code-awareness (via macros) are used to  "
-    [:strong "automatically display what changed between the various steps of building the final chart. "]
-    "This might make the chart's code more accessible, as it's digested in small increments by the reader of the code. "
-    "It may also be useful for teaching Vega."]
-   [:p
-    "Another strength of Clojure in this case is its data-transformation capabilities, "
-    "which make the incremental edits to the Vega steps manageable."]
-   [:p
-    [:strong
-     "The rest of this document was generated automatically, "
-     "from the code that programs the incremental edits leading to the final chart."]]])
 
-(def sculpture
-  [:div
-   <introduction>
-   (sculpting-oz {::viz-type :vega, ::targets-reagent? true}
-     initial-vertical-bar-chart
-     transforms-to-beef-plans)])
+;; ------------------------------------------------------------------------------
+;; Basic picture for reduction plans bar chart
+
+(def basic-reduction-plans
+  [{:plan_actions
+    [{:rdact_description "-50% GHG intensity"
+      :rdact_cb (-> -50. (cB/rpct-to-scalar) (cB/scalar-to-cB))
+      :rdact_factor "intensity"}
+     {:rdact_description "-40% Consumption level"
+      :rdact_cb (-> -40. (cB/rpct-to-scalar) (cB/scalar-to-cB))
+      :rdact_factor "consumption"}]}])
+
+;; IMPROVEMENT show total reduction in %
 
 
-(oz/view! sculpture)
+(def basic-reductions_transforms
+  (into (reduction-plans-bar-chart-transforms basic-reduction-plans nil)
+    [(dc/tfn add-total-rpct
+       [vega-spec]
+       (-> vega-spec
+         (update :data conj
+           {:name "reduction_plans",
+            :values (->> basic-reduction-plans
+                      (into []
+                        (map-indexed
+                          (fn [plan-id rplan]
+                            (let [plan_total_cb (->> rplan :plan_actions
+                                                  (map :rdact_cb)
+                                                  (apply + 0.))]
+                              {:plan_id plan-id
+                               :plan_total_cb plan_total_cb
+                               :plan_total_rpct
+                               (-> plan_total_cb
+                                 (cB/cB-to-scalar)
+                                 (cB/scalar-to-rpct))})))))})
+         (update :marks conj
+           {:name "plan_total_reduction_txt"
+            :type "text",
+            :from {:data "reduction_plans"},
+            :encode {:enter
+                     (-> {:text {:signal "format(datum.plan_total_rpct, '.1f') + '%'"}
+                          :x {:scale "xscale", :field :plan_total_cb, :offset 2}
+                          :y {:scale "yscale", :field :plan_id}
+                          :width {:scale "xscale", :field :rdact_cb}
+                          :height {:scale "yscale"}
+                          :align {:value "left"},
+                          :fontStyle {:value :italic}
+                          :fontWeight {:value :bold}
+                          :fillOpacity {:value 0.6}}
+                       (text_center-in-hband))}})))]))
+
+(oz/view! [:vega (dc/end-result initial-vertical-bar-chart basic-reductions_transforms)])
+
+
+;; ------------------------------------------------------------------------------
+;; Various plans for reducing beed consumption GHG emissions
+
+
+(def beef-reduction-plans
+  [{:plan_actions
+    [{:rdact_description "10X fewer meat meals"
+      :rdact_cb -100.
+      :rdact_factor "consumption"}]}
+   {:plan_actions
+    (let [cb0 (-> -60. (cB/rpct-to-scalar) (cB/scalar-to-cB))]
+      [{:rdact_description "Switch to low-carbon beef producers"
+        :rdact_cb cb0
+        :rdact_factor "intensity"}
+       {:rdact_description "4X fewer meat meals"
+        :rdact_cb (- -100. cb0)
+        :rdact_factor "consumption"}])}
+   {:plan_actions
+    (let [cb0 (-> -45. (cB/rpct-to-scalar) (cB/scalar-to-cB))]
+      [{:rdact_description "Replace half of beef by poultry/pork"
+        :rdact_cb cb0
+        :rdact_factor "intensity"}
+       {:rdact_description "5X fewer meat meals"
+        :rdact_cb (- -100. cb0)
+        :rdact_factor "consumption"}])}
+   {:plan_actions
+    [{:rdact_description "Replace all beef by poultry"
+      :rdact_cb -100.
+      :rdact_factor "intensity"}]}])
+
+
+(def transforms-for-reduction-plans-bar-chart
+  (reduction-plans-bar-chart-transforms beef-reduction-plans "4 diet plans to reduce GHG emissions from beef consumption."))
+
+
+;(oz/view! [:vega (dc/end-result initial-vertical-bar-chart transforms-for-reduction-plans-bar-chart)])
+;(oz/view! (sculpture-oz-page {::viz-type :vega, ::targets-reagent? true} initial-vertical-bar-chart transforms-for-reduction-plans-bar-chart))
 
 (comment
 
   (oz/export!
-    [:div
-     <introduction>
-     (sculpting-oz {::viz-type :vega, ::targets-reagent? false}
-       initial-vertical-bar-chart
-       transforms-to-beef-plans)]
+    (sculpture-oz-page {::viz-type :vega, ::targets-reagent? false} initial-vertical-bar-chart transforms-for-reduction-plans-bar-chart)
     "generated/sculpture-test-0.html")
 
   (ddiff/pretty-print
@@ -2199,5 +2178,6 @@
     (ddiff/printer {:color-markup :html-inline}))
 
   *e)
+
 
 
