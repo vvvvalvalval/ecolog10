@@ -17,16 +17,12 @@ ____
 
 [WARNING]
 ====
-This website is still a work in progress. In particular, the following enhancements are planned:
-
-1. Interactive widget for the above.
-1. New section about caveats, limitations and workarounds
-1. French translation
+_**This article is a draft. Please do not share it publicly yet.**_
 
 ====
 
 
-This article provides an exposition of techniques for considering reductions of GHG emissions, based on using _**centibels**_, a little-known method for quantifying change.
+This article provides an exposition of techniques for considering reductions of GHG emissions, based on using _**centibels**_, a little-known concept for quantifying change.
 
 These alternative techniques, illustrated here through various examples, **complement rather than replace** the more familiar ones. They provide another perspective on a range of emissions-reduction problems which makes them **more straightforward to reason about**, in particular by enabling **new types of visualizations**.
 
@@ -119,10 +115,76 @@ In addition, here are a few more useful reference points:
 A small amount of practice makes it much easier to convert between centibels and other representations; however, even that is not always needed. As we'll see, centibels can sometimes be used fruitfully without ever converting them to percentages or physical units, by expressing in the first place the inputs and outputs of the problem at hand in centibels, and letting intuition handle them as it would any other quantity.
 
 
-== Problem: compounded reductions are misrepresented
+== Problem: figuring compounded reductions
 
-FIXME
+When asking how much CO₂ is emitted by a given activity, a reasonably accurate answer is often of the form:
 
+[latexmath]
+++++
+\text{GHG emissions} = \text{Consumption level} \times \text{GHG intensity}
+++++
+
+The above formula decomposes GHG emissions into 2 factors:
+
+. **GHG intensity:** how much GHG we emit by consuming 1 unit of something.
+    * also known as the _Emission Factor_.
+. **Consumption level:** how many units of something are consumed.
+
+Here are some examples of applying the above formula:
+
+.Examples of GHG emissions broken down into GHG intensity and Consumption level.footnote:[Sources: https://www.ipcc.ch/site/assets/uploads/2018/02/ipcc_wg3_ar5_chapter7.pdf[IPCC AR5, Chapter 7]; https://www.epa.gov/sites/production/files/2015-07/documents/emission-factors_2014.pdf[epa.gov]; https://ourworldindata.org/environmental-impacts-of-food#where-do-the-emissions-from-our-food-come-from[Our World In Data].]
+[cols=6*, options="header", grid=rows, cols="~,~,~,~,~,~"]
+|===
+
+|Activity
+|Consumption level
+|
+|GHG intensity
+|
+|GHG emissions
+
+|Electricity from coal
+|10.0 MWh
+|latexmath:[\times]
+|https://www.ipcc.ch/site/assets/uploads/2018/02/ipcc_wg3_ar5_chapter7.pdf[1.05 tCO₂e/MWh]
+|latexmath:[=]
+|10.5 tCO₂e
+
+|Electricity from natural gas
+|10.0 MWh
+|latexmath:[\times]
+|https://www.ipcc.ch/site/assets/uploads/2018/02/ipcc_wg3_ar5_chapter7.pdf[0.6 tCO₂e/MWh]
+|latexmath:[=]
+|6 tCO₂e
+
+|Driving a gasoline passenger car
+|20 km
+|latexmath:[\times]
+|https://www.epa.gov/sites/production/files/2015-07/documents/emission-factors_2014.pdf[0.23 kgCO₂e/km]
+|latexmath:[=]
+|4.6 kgCO₂e
+
+
+|Eating beef
+|0.20 kg
+|latexmath:[\times]
+|https://ourworldindata.org/environmental-impacts-of-food#where-do-the-emissions-from-our-food-come-from[60 kgCO₂e/kg]
+|latexmath:[=]
+|12 kgCO₂e
+
+
+|===
+
+The important aspect to us in the above formula is that these factors are combined by a multiplication (not an addition).
+
+This multiplicative relation makes it **difficult to figure the overall impact of combining reductions to several factors,** because the impact of each reduction depends on the others: we say that **the reductions are _compounded_.** For example, when reducing at the same time GHG intensity by -50% and consumption level by -40%, the overall reduction of GHG emissions is not -90% as intuition might suggest, but a more disappointing -70%.
+
+The fundamental problem here is that multiplicative relations are less intuitive to handle and visualize than additive ones. Centibels alleviate that problem, by turning multiplications into additions: -30 cB on GHG intensity combined with -22 cB on consumption level _really_ does yield -52 cB on GHG emissions.
+
+While centibels do make the math easier, their main added value is probably to allow new presentations of the problem, especially visual ones. The basic picture is:
+
+.Example of combined efficency and sobriety actions for reducing GHG emissions.
+image::reduction-plans-basic-picture-bar-chart.svg[width=100%]
 
 As an example, suppose that you're a regular meat eater, and want to reduce the GHG footprint of your diet footnote:[For more on food-related GHG emissions, see https://ourworldindata.org/environmental-impacts-of-food#co2-and-greenhouse-gas-emissions]. As is the case for many people, you realize that consuming beef accounts for most of that footprint, and so decide to reduce these beef-related GHG-emissions by a factor of 10 (therefore, a reduction of -90%, or equivalently -100 cB).
 
@@ -138,11 +200,12 @@ image::beef-diet-plans-bar-chart.svg[width=100%]
 
 Note that the above chart is only possible _because_ we are framing the problem in centibels.
 
-**_Efficiency or sobriety?_**
 
-What must we do to reduce the climate footprint of meat? Should we produce it differently, or should we just eat less of it?
+=== Efficiency or sobriety?
 
-While environmental questions are often framed in such binary terms, the above figure shows us that there is in fact a continuum of possible responses, and gives us more precise answers than a vague _"well, we should do both"_.
+_What must we do to reduce the climate footprint of meat consumption? Should we eat different meat, or should we just eat less meat?_
+
+While environmental questions are often framed in such binary terms, polarizing the debate, the previous figure shows us that there is in fact a continuum of possible responses, and gives us more precise answers than a vague _"well, we should do both"_.
 
 [TIP]
 ====
@@ -238,6 +301,12 @@ In other words, in a -90% reduction trajectory, **eliminating the first 10% of e
 
 .When reducing emissions, the first 10% of progress are usually much less expensive than the last. Centibels naturally account for this reality.
 image::cb-rcpt-jumps.svg[width=100%]
+
+The above figure also illustrates the **main shortcoming of centibels: _the reduction in centibels is not proportional to the reduced emissions._** As we progress along the reduction path, progressing by -1cB achieves less and less in terms of reduced tonnage of CO₂, whereas progressing by -1% always means eliminating one 100th of initial emissions.
+
+Therefore, **centibels are usually a better proxy of reduction cost than of reduction impact.**
+
+Having said that, this shortcoming is not always a huge loss. One of the lessons of this section is that it makes little sense to ask for the CO₂ impact of a reduction action when it's compounded with others (_How much CO₂ does it save to halve carbon intensity?_ Well, it depends on how the consumption level evolves).
 
 
 == Application: decomposing the reduction effort across factors
@@ -372,13 +441,13 @@ For example, in order to account for 'inertia' in yearly emissions, another appr
 [WARNING]
 .Emissions budgets may vary by country or sector
 ====
-FIXME
+For various reasons ranging from equity to practicality, it might be sensible that emissions budgets not be distributed uniformly among countries or industrial sectors. This implies different decarbonization speeds and Pivot Years across countries and sectors.
 ====
 
 [WARNING]
 .Negative emissions
 ====
-FIXME
+Some emission pathways plan for GHG emissions to become negative after a few decades. Centibels cannot handle negative quantities, and so are not suitable for modeling such pathways.
 ====
 
 
@@ -424,7 +493,7 @@ Can we do something about latexmath:[\frac{E}{\text{GDP}}], i.e make our economi
 People and governments tend to have strong feelings about demographic policies and economic growth; we will not debate here what objectives are acceptable regarding these factors, but it's important not to forget that they exist and can exert strong influence on GHG emissions, for better or for worse.
 
 
-== Application: tackling more advanced emissions models
+== Application: handling more advanced emissions models
 
 Some situations demand more sophisticated emissions models than an elementary multiplication of factors, because some of the factors have to be raised to a certain power. These emissions models, known as _power laws_, are typically not discussed outside of technical circles, due to their relative mathematical sophistication. As we'll see, using centibels can make it easier to reason about such models.
 
@@ -526,6 +595,20 @@ image::cars-economy-centibels.svg[]
 ////
 
 
+== Conclusion
+
+Centibels are a **conceptual tool for considering changing quantities.** As such, they play a role similar to percentages, but bring different insights. We find that centibels add a **useful perspective on reducing GHG emissions.**
+
+Centibels are valuable in situations where GHG emissions are broken down into **compounded factors**, rather than distributed over separate sectors.
+
+In particular, centibels make more tangible the **continuum of possibilities between sobriety-only and efficiency-only emissions reductions.** If this leads (as we hope) to more constructive and less polarized discussions about what the carbon transition involves, that will likely be their most useful application.
+
+Centibels represent compounded reduction actions as **additive contributions with a shared unit of measure.** Reducing emissions can then be viewed as a budget allocation problem.
+
+Some emissions reduction problems, when framed in centibels, become more straightforward to think about.
+
+We hope it's clear that **_centibels are not an emissions-reduction technology._** They add nothing to the set of concrete reduction actions available to us, and can only help by making us more lucid about orchestrating them.
+
 [[converting-to-from-centibels]]
 == Appendix: converting to / from centibels
 
@@ -563,3 +646,36 @@ image::example-computing-rcpt-to-cB.png[]
 image::example-computing-cB-to-rpct.png[]
 
 Note that some computations involve a latexmath:[\log] function (pronounce: "logarithm"). There exist several logarithm functions; to make sure you're using the correct onefootnote:[known as the _base-10 logarithm_.], verify that latexmath:[\log(10) = 1].
+
+
+== Appendix: on the implicit use of logarithms
+
+Some knowledgeable readers might be surprised that the word 'logarithm' never appears in the body of this article. Indeed, logarithms are essential to centibels, and the link:centibels-logarithmic-representations-for-the-carbon-transition.html[companion technical article] is very explicit about this. When writing the present article, we made this omission deliberately, in order to prove a point: that most of the benefits of logarithmic representations can be reaped without any formal understanding of their mathematical foundations, the key substitute being the centibel unit of measure. There are a few historical precedents: the pH for acidity, the Richter magnitude scale for earthquakes, and of course the decibel, mostly used for sound, are all logarithmic units in common use.
+
+Many of the centibel-based graphics in this article are visually equivalent to using a logarithmic scale on some axis. The advantage of centibels over logarithmic scales is that they convey meaning which extends outside of the graphics. For non-scientific audiences, logarithmic scales usually demand to be complemented by an explanation anyway.
+
+
+== About the authors
+
+[.float-group]
+--
+[.left]
+image::author-picture-vw.jpg[width=144]
+
+https://vvvvalvalval.github.io/pages/about.html[Valentin Waeselynck] is an independent software engineer and data scientist, with an interest in technical pedagogy.
+
+He graduated from the École Polytechnique.
+--
+
+
+[.float-group]
+--
+[.right]
+image::author-picture-pv.jpg[width=144]
+
+[.text-right]
+https://www.linkedin.com/in/pauline-vialatte-92b16bb3/[Pauline Vialatte] currently manages environmental projects at the French Development Agency, after several years working as a Climate/Energy consultant.
+
+[.text-right]
+She graduated in Engineering at Institut d'Optique Graduate School, and in Sustainable Development at HEC Paris.
+--
