@@ -17,6 +17,7 @@
 (def exp-decay-multi-chart
   (let [limit-year (+ ref-year (/ input-data/remaining-carbon-budget input-data/yearly-emissions-2019))]
     {:$schema "https://vega.github.io/schema/vega-lite/v4.json",
+     :padding 20
      :description "Various scenarios for constant centibel-speed (a.k.a 'exponential decay') emissions pathways",
      :title {:text "Reducing emissions at constant centibel-speed (exponential decay)"
              :subtitle "Deducing the centibel-slope from the remaining emissions budget and the '-43.4 cB guideline'"
@@ -78,7 +79,8 @@
                     :y {:field :yearly_ghg_emissions, :type "quantitative"
                         :title "CO₂ emissions (GtCO₂e/year)"}
                     :color {:field :red_start_year, :type "nominal"
-                            :legend {:title "Reductions start year"}}}}
+                            :legend {:title "Reductions start year"}}
+                    :strokeWidth {:value 1}}}
         {:data {:values [{:t (udata/year->temporal limit-year)
                           :init_ghg_emissions input-data/yearly-emissions-2019
                           :zero_emissions 0.}]}
@@ -91,7 +93,8 @@
            :encoding {:x {:field :t, :type "temporal"}
                       :y {:field :init_ghg_emissions, :type "quantitative"}
                       :y2 {:field :zero_emissions, :type "quantitative"}
-                      :strokeDash {:value [3 2]}}}
+                      :strokeDash {:value [3 2]}
+                      :strokeWidth {:value 1}}}
           {:mark {:type "text",
                   :align "left",
                   :baseline "bottom",
@@ -126,7 +129,8 @@
                     :y {:field :cB_red, :type "quantitative"
                         :title "Reduction (cB)"}
                     :color {:field :red_start_year, :type "nominal"
-                            :legend {:title "Reductions start year"}}}}
+                            :legend {:title "Reductions start year"}}
+                    :strokeWidth {:value 1}}}
         {:data {:values
                 (for [rstart-y (reverse redstart-years)]
                   (let [t 2045]
@@ -162,7 +166,8 @@
                     :opacity {:value 1.}}
          :layer
          [{:mark "rule"
-           :encoding {:y {:field :cB_red, :type "quantitative"}}}
+           :encoding {:y {:field :cB_red, :type "quantitative"}
+                      :strokeWidth {:value 1}}}
           {:mark {:type "text",
                   :align "left",
                   :baseline "middle",
@@ -179,7 +184,8 @@
          :layer
          [{:mark "rule"
            :encoding {:x {:field :t, :type "temporal"}
-                      :strokeDash {:value [3 2]}}}
+                      :strokeDash {:value [3 2]}
+                      :strokeWidth {:value 1}}}
           {:mark {:type "text",
                   :align "left",
                   :baseline "top",

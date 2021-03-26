@@ -45,7 +45,7 @@
                         :type "nominal"
                         :legend {:title nil
                                  :labelExpr "slice(datum.value, 2)"}}
-                :strokeWidth {:value 2}}}
+                :strokeWidth {:value 1}}}
     {:mark {:type :line
             :interpolate :monotone}
      :transform [{:filter "!datum.is_exact"}]
@@ -57,8 +57,8 @@
                         :type "nominal"
                         :legend {:title nil
                                  :labelExpr "slice(datum.value, 2)"}}
-                :strokeDash {:value [4 1]}
-                :strokeWidth {:value 1}}}]})
+                :strokeDash {:value [2 1]}
+                :strokeWidth {:value 0.5}}}]})
 
 
 (defn get-vegalite-chart

@@ -18,8 +18,9 @@
              :anchor "middle"
              :orient "bottom"
              :baseline "top"}
+     :padding 20
      :vconcat
-     [{:height 120 :width 480
+     [{:height 120 :width 360
        :layer
        [{:data {:values [{:t_0 (udata/year->temporal ref-year)
                           :t_l (udata/year->temporal pivot-year)
@@ -68,8 +69,9 @@
          :encoding {:x {:field :t, :type "temporal",
                         :title "Time"}
                     :y {:field :yearly_ghg_emissions, :type "quantitative"
-                        :title "CO₂ emissions (GtCO₂e/year)"}}}]}
-      {:height 180 :width 480
+                        :title "CO₂ emissions (GtCO₂e/year)"}
+                    :strokeWidth {:value 1}}}]}
+      {:height 180 :width 360
        :layer
        [{:data {:values
                 (for [t [2019
@@ -91,7 +93,8 @@
                         :title nil
                         :axis {:orient "top"}},
                     :y {:field :cB_red, :type "quantitative"
-                        :title "Reduction (cB)"}}}
+                        :title "Reduction (cB)"}
+                    :strokeWidth {:value 1}}}
         {:data {:values
                 [(let [t 2045]
                    {:t (udata/year->temporal t)
