@@ -1,4 +1,4 @@
-(ns centibel-sobriety.math)
+(ns ecolog10.centibels-math)
 
 
 (defn rpct-to-scalar
@@ -22,7 +22,3 @@
   [scalar]
   (* 100
     (- scalar 1)))
-
-(comment
-
-  *e)

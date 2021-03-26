@@ -1,5 +1,5 @@
-(ns centibel-sobriety.data-analysis
-  (:require [centibel-sobriety.math :as cB :refer :all]
+(ns ecolog10.data-analysis
+  (:require [ecolog10.centibels-math :as cB :refer :all]
             [clojure.data.csv :as csv]
             [clojure.java.io :as io]
             [clojure.set :as cset]
