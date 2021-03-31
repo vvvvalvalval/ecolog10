@@ -14,6 +14,11 @@ ____
 We need a plan that adds up!
 ____
 
+// TODO link to source code (Val, 11 Mar 2021)
+// IMPROVEMENT over default Asciidoctor theme: more emphasis on TIP (Val, 11 Mar 2021)
+// IMPROVEMENT over default Asciidoctor theme: other colours (Val, 11 Mar 2021)
+
+
 
 [WARNING]
 ====
@@ -39,7 +44,7 @@ There is a link:centibels-logarithmic-representations-for-the-carbon-transition.
 
 Currently, we're not very good as dealing with such numbers. This guide aims to provide everyone with intellectual tools that make this quantitative planning more straightforward in many situations, while requiring no more than elementary-school math.
 
-The main notion we introduce is the *centibel*. The _centibel_ (abbreviated 'cB') is a unit of measure for how much some quantity gets scaled or downscaled. Here we will use centibels to quantify variations of GHG emissions and related quantities. It turns out that if we frame our objectives and opportunities in terms of centibels (as opposed to percentages or physical units), many GHG reductions problems become easy to work out and visualize.
+The main notion we introduce is the *https://en.wikipedia.org/wiki/Decibel[centibel]*. The _centibel_ (abbreviated 'cB') is a unit of measure for how much some quantity gets scaled or downscaled. Here we will use centibels to quantify variations of GHG emissions and related quantities. It turns out that if we frame our objectives and opportunities in terms of centibels (as opposed to percentages or physical units), many GHG reductions problems become easy to work out and visualize.
 
 Centibels have a use similar to percentages: they describe relative variations. As you can say that some quantity varies by +25% or -50%, so you can say that it varies by +10cB or -30cB. Here are a few more examples:
 
