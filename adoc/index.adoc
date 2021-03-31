@@ -1,5 +1,3 @@
-:author: Valentin Waeselynck, Pauline Vialatte
-:email: valentin.waeselynck@polytechnique.edu, pauline.vialatte@hec.edu
 :man-linkstyle: blue R <>
 :mansource: Asciidoctor
 :manversion: 1.0
@@ -8,6 +6,7 @@
 :imagesdir: ./img
 :stem:
 = In centibels: another perspective on reducing GHG emissions =
+Valentin Waeselynck <valentin.waeselynck@polytechnique.edu>; Pauline Vialatte <pauline.vialatte@hec.edu>
 
 [quote,'David Mackay', 'https://www.withouthotair.com/[*Sustainable Energy, without the hot air*]']
 ____
@@ -669,7 +668,7 @@ image::author-picture-vw.jpg[width=144]
 
 https://vvvvalvalval.github.io/pages/about.html[Valentin Waeselynck] is an independent software engineer and data scientist, with an interest in technical pedagogy.
 
-He graduated from the École Polytechnique.
+He graduated in Engineering from the École Polytechnique.
 --
 
 
