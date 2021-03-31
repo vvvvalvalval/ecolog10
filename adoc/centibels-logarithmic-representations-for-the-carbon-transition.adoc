@@ -49,7 +49,7 @@ The _centibel variation_ of a positive quantity varying from latexmath:[q_0] to 
 
 As hinted by the name, such a quantification is measured in _centibels_ (a centibel is one 100th of a bel; bels measure base-10 logarithms. In formulas, centibels go with the constant latexmath:[\frac{100}{\ln 10}]. There is nothing novel about this.)
 
-.A range of reductions quantified both in centibels and relative percentages.
+.A range of reductions quantified both in centibels and relative percentages. footnote:[The source code and data for all graphics in this article may be found at link:https://github.com/vvvvalvalval/ecolog10[github.com/vvvvalvalval/ecolog10]]
 image::rpct-centibels-conversion-ruler.svg[width=100%]
 
 In the previous formula, the latexmath:[\log_{10}] function is the _base-10 logarithm_, which we'll simply denote latexmath:[\log] in the rest of the article. The involvement of this function is why we call the centibel variation a 'logarithmic representation'. This function can be defined as:

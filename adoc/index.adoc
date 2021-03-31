@@ -97,7 +97,7 @@ Centibels have a use similar to percentages: they describe relative variations. 
 However, centibels don't work like percentages, because *multiplying variations maps to adding the corresponding centibels:* for example, dividing a quantity by 2 (-30 cB) then dividing the result by 3 (-48cB) is a (-30) + (-48) = -78 cB reduction. This property of turning multiplications into additions is what makes centibels useful, and percentages have no such property.
 
 
-We will show you how to concretly convert between percentages and centibels in <<converting-to-from-centibels, the Appendix>>. Meanwhile, the following scale provides a visual reference:
+We will show you how to concretly convert between percentages and centibels in <<converting-to-from-centibels, the Appendix>>. Meanwhile, the following scale provides a visual reference: footnote:[The source code for all graphics in this article may be found at link:https://github.com/vvvvalvalval/ecolog10[github.com/vvvvalvalval/ecolog10]]
 
 image::rpct-centibels-conversion-ruler.svg[width=100%]
 
