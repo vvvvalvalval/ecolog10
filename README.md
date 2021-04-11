@@ -1,4 +1,4 @@
-# centibel-sobriety
+# ecolog10
 
 An accessible introduction to using logarithmic representations for planning the environmental transition.
 

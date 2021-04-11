@@ -24,7 +24,7 @@
       :rdact_factor "Cement density"}]
     (as-> reds
       (conj reds
-        {:rdact_description "Sobriety: building less or smaller"
+        {:rdact_description "Frugality: building less or smaller"
          :rdact_cb (- cement-target-cb
                      (apply +
                        (map :rdact_cb

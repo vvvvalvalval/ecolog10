@@ -12,7 +12,7 @@
     :rdact_colour "#4c72b0"}
    {:rdact_factor 0.4
     :rdact_factor_name "(Usage)"
-    :rdact_description "Sobriety: -60% usage"
+    :rdact_description "Frugality: -60% usage"
     :rdact_colour "#55a868"}])
 
 
@@ -21,7 +21,7 @@
                      (map :rdact_factor reduction-actions))]
     {:$schema "https://vega.github.io/schema/vega/v5.json",
      :title
-     {:text "Classical and centibel-based visualizations of a carbon strategy compounding efficiency and sobriety gains"
+     {:text "Classical and centibel-based visualizations of a carbon strategy compounding efficiency and frugality gains"
       :subtitle "Note that all 3 charts represent exactly the same reduction actions. By using centibels, the 3rd chart is not biased towards a particular factor."
       :orient :bottom
       :offset 15}

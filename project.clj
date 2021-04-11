@@ -1,4 +1,4 @@
-(defproject vvvvalvalval/centibels-sobriety "0.1.0-SNAPSHOT"
+(defproject vvvvalvalval/ecolog10 "0.1.0-SNAPSHOT"
   :description "An accessible introduction to using logarithmic representations for planning the environmental transition."
   :url "https://github.com/asciidoctor/asciidoctor-lein-plugin/tree/master/example"
   :license {:name "The MIT License"

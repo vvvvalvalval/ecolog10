@@ -42,5 +42,5 @@
             chart]]))
       (interpose [:hr]))))
 
-;(oz/view! (page-view-all))
+(oz/view! (page-view-all))
 

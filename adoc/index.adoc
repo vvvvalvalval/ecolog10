@@ -187,14 +187,14 @@ The fundamental problem here is that multiplicative relations are less intuitive
 
 While centibels do make the math easier, their main added value is probably to allow new presentations of the problem, especially visual ones. The basic picture is:
 
-.Example of combined efficency and sobriety actions for reducing GHG emissions.
+.Example of combined efficency and frugality actions for reducing GHG emissions.
 image::reduction-plans-basic-picture-bar-chart.svg[width=100%]
 
 As an example, suppose that you're a regular meat eater, and want to reduce the GHG footprint of your diet footnote:[For more on food-related GHG emissions, see https://ourworldindata.org/environmental-impacts-of-food#co2-and-greenhouse-gas-emissions]. As is the case for many people, you realize that consuming beef accounts for most of that footprint, and so decide to reduce these beef-related GHG-emissions by a factor of 10 (therefore, a reduction of -90%, or equivalently -100 cB).
 
 To achieve this objective, you have a spectrum of strategies:
 
-. **sobriety approach:** eating meat 10 times less frequently;
+. **frugality approach:** eating meat 10 times less frequently;
 . **efficiency approach:** replacing beef with meat that is 10 times less carbon-intensive, such as poultry or pork;
 . a mix of the above 2 approaches.
 
@@ -205,7 +205,7 @@ image::beef-diet-plans-bar-chart.svg[width=100%]
 Note that the above chart is only possible _because_ we are framing the problem in centibels.
 
 
-=== Efficiency or sobriety?
+=== Efficiency or frugality?
 
 _What must we do to reduce the climate footprint of meat consumption? Should we eat different meat, or should we just eat less meat?_
 
@@ -218,16 +218,16 @@ While environmental questions are often framed in such binary terms, polarizing 
 When emissions are decomposed into several factors, centibels measure emission reductions evenly across all factors.
 ====
 
-Another common problem is that impressive progress in carbon efficiency can drive us to forget how much of the work must still be done by sobriety. In our example, replacing half of beef by poultry feels significant, but attaining our objective still requires eating meat 5 times less frequently footnote:[granted, the issue is exacerbated by the fact that our objective is an ambitious reduction by 10; unfortunately, such ambitious objectives are often required for the carbon transition.]. By using centibels, the above figure makes this reality obvious.
+Another common problem is that impressive progress in carbon efficiency can drive us to forget how much of the work must still be done by frugality. In our example, replacing half of beef by poultry feels significant, but attaining our objective still requires eating meat 5 times less frequently footnote:[granted, the issue is exacerbated by the fact that our objective is an ambitious reduction by 10; unfortunately, such ambitious objectives are often required for the carbon transition.]. By using centibels, the above figure makes this reality obvious.
 
 
 [TIP]
 ====
 **KEY TAKEWAY**
 
-Centibels make it easier to plan emissions reductions as a measured combination of efficiency gains and sobriety, rather than an unrealistic binary choice between efficiency and sobriety.
+Centibels make it easier to plan emissions reductions as a measured combination of efficiency gains and frugality, rather than an unrealistic binary choice between efficiency and frugality.
 
-In particular, using centibels tends to reveal the following challenge: _even highly-impressive enhancements in efficiency can leave significant work to sobriety._
+In particular, using centibels tends to reveal the following challenge: _even highly-impressive enhancements in efficiency can leave significant work to frugality._
 
 ====
 
@@ -557,7 +557,7 @@ From here, you can deduce that _**by trading -1 cB in ship speed for +1 cB in fl
 
 So the answer is: _yes_, reducing ship speed does reduce GHG emissions in spite of the increase in fleet size (hurray!). Notice that by framing the situation in terms of centibels, we made this opportunity easy to spot and work out.
 
-For example, you can verify that a -10cB reduction in speed compensated by a +10cB increase in fleet size would translate to -20.6% in ship speed, +25.9% in fleet size, and -36.9% in GHG emissions from fuel consumption. In addition, compounding this approach with a _sobriety_ policy, we might not compensate all the way to +10cB in fleet size, in which case the GHG emissions would be even more reduced.
+For example, you can verify that a -10cB reduction in speed compensated by a +10cB increase in fleet size would translate to -20.6% in ship speed, +25.9% in fleet size, and -36.9% in GHG emissions from fuel consumption. In addition, compounding this approach with a _frugality_ policy, we might not compensate all the way to +10cB in fleet size, in which case the GHG emissions would be even more reduced.
 
 Of course, such a change would have drawbacks: for example personel costs would increase and sea voyages would last longer. But this is typically the sort of tradeoffs to be considered for the environmental transition.
 
@@ -605,7 +605,7 @@ Centibels are a **conceptual tool for considering changing quantities.** As such
 
 Centibels are valuable in situations where GHG emissions are broken down into **compounded factors**, rather than distributed over separate sectors.
 
-In particular, centibels make more tangible the **continuum of possibilities between sobriety-only and efficiency-only emissions reductions.** If this leads (as we hope) to more constructive and less polarized discussions about what the carbon transition involves, that will likely be their most useful application.
+In particular, centibels make more tangible the **continuum of possibilities between frugality-only and efficiency-only emissions reductions.** If this leads (as we hope) to more constructive and less polarized discussions about what the carbon transition involves, that will likely be their most useful application.
 
 Centibels represent compounded reduction actions as **additive contributions with a shared unit of measure.** Reducing emissions can then be viewed as a budget allocation problem.
 
