@@ -678,7 +678,7 @@ He graduated in Engineering from the École Polytechnique.
 image::author-picture-pv.jpg[width=144]
 
 [.text-right]
-https://www.linkedin.com/in/pauline-vialatte-92b16bb3/[Pauline Vialatte] currently manages environmental projects at the French Development Agency, after several years working as a Climate/Energy consultant.
+https://www.linkedin.com/in/pauline-vialatte-92b16bb3/[Pauline Vialatte] currently manages environmental projects at the French Development Agency of Santo Domingo, after several years working as a Climate/Energy consultant and carbon offset project developer at EcoAct.
 
 [.text-right]
 She graduated in Engineering at Institut d'Optique Graduate School, and in Sustainable Development at HEC Paris.
