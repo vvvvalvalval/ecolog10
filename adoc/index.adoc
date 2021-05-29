@@ -13,17 +13,8 @@ ____
 We need a plan that adds up!
 ____
 
-// TODO link to source code (Val, 11 Mar 2021)
 // IMPROVEMENT over default Asciidoctor theme: more emphasis on TIP (Val, 11 Mar 2021)
 // IMPROVEMENT over default Asciidoctor theme: other colours (Val, 11 Mar 2021)
-
-
-
-[WARNING]
-====
-_**This article is a draft. Please do not share it publicly yet.**_
-
-====
 
 
 This article provides an exposition of techniques for considering reductions of GHG emissions, based on using _**centibels**_, a little-known concept for quantifying change.

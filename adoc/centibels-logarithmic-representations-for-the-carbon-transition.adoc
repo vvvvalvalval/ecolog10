@@ -7,15 +7,6 @@
 :stem:
 = Logarithmic representations for the carbon transition =
 
-[WARNING]
-====
-This article is still a work in progress. In particular, the following enhancements are planned:
-
-1. Conclusion?
-1. Authors
-1. References
-
-====
 
 This article presents ways of reasoning and communicating about reducing GHG emissions and energy consumption, which at the time of writing are not in common use. Starting from the observation that many common models for GHG emissions are essentially multiplicative, we describe how to use logarithmic representations for approaching various emissions reduction problems in a straightforward way.
 
