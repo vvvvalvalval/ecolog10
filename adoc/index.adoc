@@ -405,7 +405,7 @@ Emissions reduction pathways are designed so as to not emit more than this 646 G
 ====
 **Working out the required 'speed of decline' of GHG emissions, in cB/year**:
 
-1. If we kept our current yearly emissions of https://www.globalcarbonproject.org/carbonbudget/19/presentation.htm[42.1 GtCO2e/year], we would have exhausted our 646 GtCO2e carbon budget in 2036. **Let's call 2036 the _Pivot Year_** for global emissions.
+1. If we kept our current yearly emissions of https://www.globalcarbonproject.org/carbonbudget/index.htm[42.1 GtCO2e/year], we would have exhausted our 646 GtCO2e carbon budget in 2036. **Let's call 2036 the _Pivot Year_** for global emissions.
 2. **Constraint:** we must have reduced emissions by **-43.4 cB at the Pivot Year.** (-63.2%)footnote:[Note to scientists: -43.3 cB corresponds to a division by the mathematical constant e = 2.71828...]
 ====
 
