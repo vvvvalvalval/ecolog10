@@ -141,16 +141,16 @@ Here are some examples of applying the above formula:
 |Electricity from coal
 |10.0 MWh
 |latexmath:[\times]
-|https://www.ipcc.ch/site/assets/uploads/2018/02/ipcc_wg3_ar5_chapter7.pdf[1.05 tCO₂e/MWh]
+|https://www.ipcc.ch/site/assets/uploads/2018/02/ipcc_wg3_ar5_chapter7.pdf[1.05 tonCO₂e/MWh]
 |latexmath:[=]
-|10.5 tCO₂e
+|10.5 tonCO₂e
 
 |Electricity from natural gas
 |10.0 MWh
 |latexmath:[\times]
-|https://www.ipcc.ch/site/assets/uploads/2018/02/ipcc_wg3_ar5_chapter7.pdf[0.6 tCO₂e/MWh]
+|https://www.ipcc.ch/site/assets/uploads/2018/02/ipcc_wg3_ar5_chapter7.pdf[0.6 tonCO₂e/MWh]
 |latexmath:[=]
-|6 tCO₂e
+|6 tonCO₂e
 
 |Driving a gasoline passenger car
 |20 km
@@ -314,7 +314,7 @@ Assume that we want to reduce the CO₂ emissions from producing cement for cons
 
 To model cement-production GHG emissions, we decompose them into the following factors:
 
-1. **CO₂ intensity:** how much CO₂ is emitted from producing a ton of cement. (in tCO₂eq/t)
+1. **CO₂ intensity:** how much CO₂ is emitted from producing a ton of cement. (in tonCO₂eq/t)
   - _**Influenced by:** production technology._
 1. **Construction density:** how much cement we use per building area (in t/m²).
   - _**Influenced by:** architectural design._
@@ -340,7 +340,7 @@ image::cement-economy-centibels.svg[width=100%]
 
 When expressed in centibels, emissions reduction objectives become a 'budget' problem: how many centibels are contributed by each factor.
 
-This is not possible with percentages or tCO₂eq, because the reductions on individual factors are compounded.
+This is not possible with percentages or tonCO₂eq, because the reductions on individual factors are compounded.
 ====
 
 
