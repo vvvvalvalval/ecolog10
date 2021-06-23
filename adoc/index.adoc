@@ -32,7 +32,7 @@ There is a link:centibels-logarithmic-representations-for-the-carbon-transition.
 
 *The problem:* the environmental transition requires us to make plans with numbers - numbers such as 'GHG emissions must be reduced by 5% every year' or 'the emissions from sea shipping should be halved by 2050'.
 
-Currently, we're not very good as dealing with such numbers. This guide aims to provide everyone with intellectual tools that make this quantitative planning more straightforward in many situations, while requiring no more than elementary-school math.
+Currently, we're not very good at dealing with such numbers. This guide aims to provide everyone with intellectual tools that make this quantitative planning more straightforward in many situations, while requiring no more than elementary-school math.
 
 The main notion we introduce is the *https://en.wikipedia.org/wiki/Decibel[centibel]*. The _centibel_ (abbreviated 'cB') is a unit of measure for how much some quantity gets scaled or downscaled. Here we will use centibels to quantify variations of GHG emissions and related quantities. It turns out that if we frame our objectives and opportunities in terms of centibels (as opposed to percentages or physical units), many GHG reductions problems become easy to work out and visualize.
 
@@ -292,7 +292,7 @@ Yet there is a sense in which the September→October transition is much harder 
 
 |===
 
-In other words, in a -90% reduction trajectory, **eliminating the first 10% of emissions is usually much easier than eliminiting the last 10%.** This applies to a broad spectrum domains, especially when the reductions consist of improving the efficiency of some process. Centibels are effective at making obvious such differences in relative variations:
+In other words, in a -90% reduction trajectory, **eliminating the first 10% of emissions is usually much easier than eliminiting the last 10%.** This applies to a broad spectrum of domains, especially when the reductions consist of improving the efficiency of some process. Centibels are effective at making obvious such differences in relative variations:
 
 .When reducing emissions, the first 10% of progress are usually much less expensive than the last. Centibels naturally account for this reality.
 image::cb-rcpt-jumps.svg[width=100%]
@@ -306,11 +306,11 @@ Having said that, this shortcoming is not always a huge loss. One of the lessons
 
 == Application: decomposing the reduction effort across factors
 
-When GHG emission result from several compounded factors, using centibels makes it straightforward to reason about reducing them. This is illustrated in the following section by considering emissions from cement production.
+When GHG emissions result from several compounded factors, using centibels makes it straightforward to reason about reducing them. This is illustrated in the following section by considering emissions from cement production.
 
 === Example: reducing emissions from cement
 
-Assume that we want to reduce the CO₂ emissions from producing cement for construction : for example, we might aim to divide these emissions by 10 (-90%) on the long term, which corresponds exactly to a -100 cB target.
+Assume that we want to reduce the CO₂ emissions from producing cement for construction: for example, we might aim to divide these emissions by 10 (-90%) on the long term, which corresponds exactly to a -100 cB target.
 
 To model cement-production GHG emissions, we decompose them into the following factors:
 
@@ -328,7 +328,7 @@ To be more explicit: in this model, CO₂ emissions are given by the following f
 \text{CO₂ emissions} = \text{CO₂ intensity} \times \text{Construction density} \times \text{Usage}
 ++++
 
-When using centibels, the above equation turns in to the 'budget problem' of splitting the -100cB reduction across our 3 factors. The following chart provides an example:
+When using centibels, the above equation turns into the 'budget problem' of splitting the -100cB reduction across our 3 factors. The following chart provides an example:
 
 [#cement-economy-centibels]
 .How various reduction actions might be combined to lower CO₂ emissions from cement (numbers chosen arbitrarily).
@@ -352,7 +352,7 @@ The previous section discussed allocating emissions reduction efforts over sever
 []
 ====
 
-*Case study:* To have a good chance of limiting global warming to less than +2°C, we decide starting from now to *reduce GHG emissions at a rate of -6.4% every year.*
+*Case study:* to have a good chance of limiting global warming to less than +2°C, we decide starting from now to *reduce GHG emissions at a rate of -6.4% every year.*
 
 _By how much will we have reduced GHG emissions in 10 years?_
 
@@ -457,12 +457,12 @@ The Kaya equation describes the GHG emissions of a society by decomposing them i
 
 The factors are:
 
-* latexmath:[\text{Pop}] : the *population size* (in persons)
-* latexmath:[\frac{\text{GDP}}{\text{Pop}}] : the *GDP per capita* (in $/person)
+* latexmath:[\text{Pop}]: the *population size* (in persons)
+* latexmath:[\frac{\text{GDP}}{\text{Pop}}]: the *GDP per capita* (in $/person)
   - can be loosely interpreted as the average "standard of living" (how much economic production each person enjoys on average), with important caveats in said interpretation.
-* latexmath:[\frac{E}{\text{GDP}}] : the *energy intensity of economic production* (in kWh/$)
+* latexmath:[\frac{E}{\text{GDP}}]: the *energy intensity of economic production* (in kWh/$)
   - in English: how much energy is needed to produce $1 of added value (on average).
-* latexmath:[\frac{\text{GHG}}{E}] : the *carbon content of energy* (in gCO₂eq/kWh)
+* latexmath:[\frac{\text{GHG}}{E}]: the *carbon content of energy* (in gCO₂eq/kWh)
   - in English: how much CO₂ is emitted when consuming 1kWh of energy (on average).
 
 

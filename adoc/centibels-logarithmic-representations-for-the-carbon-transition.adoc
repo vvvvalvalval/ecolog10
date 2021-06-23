@@ -100,7 +100,7 @@ As an example, consider the following emissions model for cement production:
 ====
 *Example: reducing CO₂ emissions from cement*
 
-Assume that we want to reduce CO₂ emissions from cement in a given sector of civil engineering; planning to divide them by 10 (-100 cB).
+Assume that we want to reduce CO₂ emissions from cement in a given sector of civil engineering, planning to divide them by 10 (-100 cB).
 
 We decompose these emissions into the following factors:
 
@@ -228,12 +228,12 @@ Formally, an _exponential-decay pathway_ starting at time latexmath:[t_0] plans 
 
 [latexmath]
 ++++
-E(t) = E(t_0) e^{- \frac{t}{T}} \quad \text{for } t \geq t_0
+E(t) = E(t_0) e^{- \frac{t - t_0}{T}} \quad \text{for } t \geq t_0
 ++++
 
 in which latexmath:[T] is a duration constant (in years) that determines the "pace" of reduction (smaller is faster).
 
-The cumulated emissoins after latexmath:[t_0] are given by:
+The cumulated emissions after latexmath:[t_0] are given by:
 
 [latexmath]
 ++++
@@ -259,7 +259,7 @@ This is illustrated by the following chart:
 image::exp-decay-pathway.svg[width=100%]
 
 
-Indeed, denoting latexmath:[c_b(t)] the centivels-variation of emissions levels since latexmath:[t_0], we have:
+Indeed, denoting latexmath:[c_b(t)] the centibels-variation of emissions levels since latexmath:[t_0], we have:
 
 [latexmath]
 ++++
@@ -276,9 +276,9 @@ The "centibel-speed" of reduction latexmath:[\dot{c}_b] is therefore given by:
 
 === Delaying reduction, and the "rendez-vous point rule"
 
-It is frequently stressed that the more we delay in staarting to reduce GHG emissions, the faster we will need to reduce once we've started. Centibels allow for a simple mental model to turn this intuition into a quantitative guideline.
+It is frequently stressed that the more we delay in starting to reduce GHG emissions, the faster we will need to reduce once we've started. Centibels allow for a simple mental model to turn this intuition into a quantitative guideline.
 
-Let us call _Pivot Year_ the time latexmath:[t_P] at which our Carbon Budget would be exhausted if emissions levels remained constant. It can be proved that, whatever the time latexmath:[t_0 \leq t_P] at which we start reducing emissions by an exponential-decay pathway, and assuming emission levels remain constant before latexmath:[t_0], we have
+Let us call _Pivot Year_ the time latexmath:[t_P] at which our Carbon Budget would be exhausted if emissions levels remained constant. It can be proved that, whatever the time latexmath:[t_0 \leq t_P] at which we start reducing emissions by an exponential-decay pathway, and assuming emissions levels remain constant before latexmath:[t_0], we have
 
 
 [latexmath]
@@ -336,7 +336,7 @@ For example, rather than constant centibel-speed pathways (for which latexmath:[
 
 We now turn our attention to the problem of estimating the _effort_ or _cost_ of reducing GHG emissions. This is important in particular for planning emissions targets and the pathways to achieve them.
 
-First, let us note that the amount of avoided emissions is not proportional to the cost of avoiding them. For instance, when reducing a person's carbon footprint from 8 tonCO₂e/year to 2 tonCO₂e/year, transitioning from 8 to 6 tonCO₂e/year can be expected to be much easier than transitioning from 4 to 2 tonCO₂e/year, event though both transitions are 2 tonCO₂e/year reductions.
+First, let us note that the amount of avoided emissions is not proportional to the cost of avoiding them. For instance, when reducing a person's carbon footprint from 8 tonCO₂e/year to 2 tonCO₂e/year, transitioning from 8 to 6 tonCO₂e/year can be expected to be much easier than transitioning from 4 to 2 tonCO₂e/year, even though both transitions are 2 tonCO₂e/year reductions.
 
 Centibels naturally account for this "law of diminishing returns": in the above example, the first transition is a -12 cB variation, whereas the second is a -30 cB variation.
 
@@ -372,7 +372,7 @@ image::sketch-ghg-intensity-extrapolations.svg[width=100%]
 The above conclusion formalizes the reason why <<exponential-decay-pathways,exponential-decay pathways>> are so popular: when the reduction effort is assumed to be proportional to the centibels variation, exponential-decay pathways are those that spread the effort evenly over the years.
 ====
 
-The main objection we see to the realism of assumption A1 lies in threshold effects: in some situations, initial investments will not significantly reduce GHG emissions, until a critical when they go down a cliff, such that latexmath:[G(x)] has a stair-shaped curve. Arguably, this does not recommend for or against centibels as a proxy for cost: it rather means that long-term cost cannot be extrapolated from marginal costs in such situations.
+The main objection we see to the realism of assumption A1 lies in threshold effects: in some situations, initial investments will not significantly reduce GHG emissions, until a critical point where they go down a cliff, such that latexmath:[G(x)] has a stair-shaped curve. Arguably, this does not recommend for or against centibels as a proxy for cost: it rather means that long-term cost cannot be extrapolated from marginal costs in such situations.
 
 There is cause to believe that hypothesis A1 is largely applicable in industrial settings. As historical evidence, consider the evolution of energy efficiency of computing hardware. For 50 years, the number of computer operations per dissipated energy has doubled every 1.6 years, an exponential trend identified as https://en.wikipedia.org/wiki/Koomey%27s_law[Koomey's Law], and understandably heralded as one of the most impressive trajectories in energy efficiency across all technology domains. From this exponential trend over time, it is safe to assume footnote:[Justification: an exponential time trend is is log-affine and thus log-convex as a function of time, and annual R&D investments in computing hardware can be expected to have been increasing over time] that this energy efficiency problem follows hypothesis A1, and most other industrial technologies can be expected to have faster-declining ROIs in energy efficiency.
 
@@ -407,7 +407,7 @@ As we have seen, centibels are suitable for multiplicative emissions models. It 
 
 As soon as such a correction is made, the model is no longer multiplicative, and the use of centibels becomes questionable. This raises the question: _are centibels too fragile to be relied upon?_
 
-Experience shows a very strong appeal for multiplicative models, even when they're grossly inaccurate. For example, researches will report emissions factors for photovoltaic electricity in gCO₂/kWh, despite the fact that the emissions of a photovoltaic panel are virtually unrelated to how much electrical energy we get from it; adopting such a model artificially adds significant uncertainty to estimating the lifecycle emissions of photovoltaic eletricity, yet this disadvantage is considered a reasonable price to pay for the usability of a multiplicative model.
+Experience shows a very strong appeal for multiplicative models, even when they're grossly inaccurate. For example, researches will report emissions factors for photovoltaic electricity in gCO₂/kWh, despite the fact that the emissions of a photovoltaic panel are virtually unrelated to how much electrical energy we get from it; adopting such a model artificially adds significant uncertainty to estimating the lifecycle emissions of photovoltaic electricity, yet this disadvantage is considered a reasonable price to pay for the usability of a multiplicative model.
 
 We do not systematically recommend for or against the use of simplistic multiplicative models for GHG emissions: this is a decision that has to be made for each application, as a tradeoff between accuracy and usability. We do recommend, however, that when accuracy is sacrificed the most be made of usability; in the case of multiplicative model, that may involve the use of logarithmic representations.
 
@@ -432,7 +432,7 @@ In particular, presenting centibels as a _unit of measure_, to be manipulated li
 
 Admittedly, leaving aside the question of intellectual accessibility, percentages have over centibels the advantage of familiarity. That is true, but this familiarity is double-edged: when applied to multiplicative models, percentages commonly lead to reasoning errors.
 
-In a similar line, consider hindu-arabic numerals (this handy notation for numbers, enabling us to write '3426' rather than 'three thousand two hundred forty-six' or 'MMMCCXLVI'). Almost everyone learns to use hindu-arabic numerals as soon as elementary school footnote:[that is of course where elementary schools exist.], yet almost no one learns the mathematical theory underlying them.
+In a similar line, consider hindu-arabic numerals (this handy notation for numbers, enabling us to write '3426' rather than 'three thousand two hundred forty-six' or 'MMMCCXLVI'). Almost everyone learns to use hindu-arabic numerals as soon as elementary school footnote:[That is of course where elementary schools exist.], yet almost no one learns the mathematical theory underlying them.
 
 
 
@@ -473,7 +473,7 @@ The following table gives a few useful conversions to remember:
 
 Recalling that centibels turn multiplications into additions, other conversions can be readily derived, for example:
 
-* -95 % = × asciimath:[5/100] = × asciimath:[1/20] = × asciimath:[1/2] = × asciimath:[1/10] = -30 cB -100 cB = -130 cB
+* -95 % = × asciimath:[5/100] = × asciimath:[1/20] = × asciimath:[1/2] × asciimath:[1/10] = -30 cB -100 cB = -130 cB
 * × asciimath:[1/5] = × asciimath:[2/10] = × asciimath:[2] × asciimath:[1/10] = +30 cB -100 cB = -70 cB
 * -25 % = × asciimath:[3/4] = × asciimath:[3] × asciimath:[1/2] × asciimath:[1/2] = +48 cB -30 cB -30 cB = -12 cB
 
